@@ -134,10 +134,10 @@ class Encode(commands.Cog):
         Dengan format:
 
         Contoh:
-        acx!color #3399cc
-        acx!color rgb(3, 4, 5)
-        acx!color cmyk(1, 2, 3, 4)
-        acx!color 0xFF00FF
+        acx color #3399cc
+        acx color rgb(3, 4, 5)
+        acx color cmyk(1, 2, 3, 4)
+        acx color 0xFF00FF
         """
         em = discord.Embed(color = 0XFF8C00, description =  "> Melihat informasi kode warna.\n> \n"
                                                             "> **Panduan pengunaan**\n"
@@ -146,7 +146,7 @@ class Encode(commands.Cog):
                                                             "> `{}color #3399cc` HTML Format\n"
                                                             "> `{}color rgb(3, 4, 5)` RGB Format\n"
                                                             "> `{}color cmyk(1, 2, 3, 4)` CMYK Format\n"
-                                                            "> `{}color 0xFF00FF` HES Format"
+                                                            "> `{}color 0xFF00FF` HEX Format"
                                                             .format(ctx.prefix,
                                                                     ctx.prefix,
                                                                     ctx.prefix,

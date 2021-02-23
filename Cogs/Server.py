@@ -48,67 +48,67 @@ class Server(commands.Cog):
         ret = await PCPP.getMarkdown(pcpplink, autopcpp)
         return { "Ignore" : False, "Delete" : False, "Respond" : ret }
 
-    @commands.command(pass_context=True)
-    async def setprefix(self, ctx, *, prefix : str = None):
-        """Mengatur prefix bot ini dalam server mu (admin/owner-server only).
-        Mengetik command ini tanpa memasukan prefix akan menghapus costum prefix
-        menjadi default `acx `"""
-        isOwner = self.settings.isOwner(ctx.author)
-        if not await Utils.is_bot_admin_reply(ctx): return
-        # We're admin
-        if not prefix:
-            self.settings.setServerStat(ctx.guild, "Prefix", None)
-            msg = 'Custom server prefix telah *dihapus*.'
-        elif prefix in ['@everyone','@here']:
-            return await ctx.send("Bagus, pintar sekali..!\njadi lebih mudah dan simpel..\n**PAKAI PREFIX LAIN!**")
-        elif prefix in ['acx ']:
-            self.settings.setServerStat(ctx.guild, "Prefix", prefix)
-            msg = 'Custom server prefix menjadi: `{}`'.format(prefix)
-        elif len(prefix) > 3:
-            return await ctx.send("┐(￣ヘ￣;)┌\nprefix tidak dapat lebih dari 3, kecuali default!")
-        else:
-            self.settings.setServerStat(ctx.guild, "Prefix", prefix)
-            msg = 'Custom server prefix menjadi: `{}`'.format(prefix)
-        em = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author))
-        await ctx.send(embed = em)
+    # @commands.command(pass_context=True)
+    # async def setprefix(self, ctx, *, prefix : str = None):
+    #     """Mengatur prefix bot ini dalam server mu (admin/owner-server only).
+    #     Mengetik command ini tanpa memasukan prefix akan menghapus costum prefix
+    #     menjadi default `acx `"""
+    #     isOwner = self.settings.isOwner(ctx.author)
+    #     if not await Utils.is_bot_admin_reply(ctx): return
+    #     # We're admin
+    #     if not prefix:
+    #         self.settings.setServerStat(ctx.guild, "Prefix", None)
+    #         msg = 'Custom server prefix telah *dihapus*.'
+    #     elif prefix in ['@everyone','@here']:
+    #         return await ctx.send("Bagus, pintar sekali..!\njadi lebih mudah dan simpel..\n**PAKAI PREFIX LAIN!**")
+    #     elif prefix in ['acx ']:
+    #         self.settings.setServerStat(ctx.guild, "Prefix", prefix)
+    #         msg = 'Custom server prefix menjadi: `{}`'.format(prefix)
+    #     elif len(prefix) > 3:
+    #         return await ctx.send("┐(￣ヘ￣;)┌\nprefix tidak dapat lebih dari 3, kecuali default!")
+    #     else:
+    #         self.settings.setServerStat(ctx.guild, "Prefix", prefix)
+    #         msg = 'Custom server prefix menjadi: `{}`'.format(prefix)
+    #     em = discord.Embed(color = 0XFF8C00, description = msg)
+    #     em.set_footer(text = "{}".format(ctx.author))
+    #     await ctx.send(embed = em)
 
-    @commands.command(pass_context=True, aliases=['o-setprefix'])
-    async def setprefixowner(self, ctx, *, prefix : str = None):
-        """Mengatur prefix bot ini dalam server mu (owner-only)."""
-        isOwner = self.settings.isOwner(ctx.author)
-        if isOwner == False:
-            return
-        # We're admin
-        if not prefix:
-            self.settings.setServerStat(ctx.guild, "Prefix", None)
-            msg = 'Custom server prefix telah *dihapus*.'
-        elif prefix in ['@everyone','@here']:
-            return await ctx.send("Bagus, pintar sekali..!\njadi lebih mudah dan simpel..\n**PAKAI PREFIX LAIN!**")
-        elif prefix in ['acx ']:
-            self.settings.setServerStat(ctx.guild, "Prefix", prefix)
-            msg = 'Custom server prefix menjadi: `{}`'.format(prefix)
-        elif len(prefix) > 3:
-            return await ctx.send("┐(￣ヘ￣;)┌\nprefix tidak dapat lebih dari 3, kecuali default!")
-        else:
-            self.settings.setServerStat(ctx.guild, "Prefix", prefix)
-            msg = 'Custom server prefix menjadi: `{}`'.format(prefix)
-        em = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author))
-        await ctx.send(embed = em)
+    # @commands.command(pass_context=True, aliases=['o-setprefix'])
+    # async def setprefixowner(self, ctx, *, prefix : str = None):
+    #     """Mengatur prefix bot ini dalam server mu (owner-only)."""
+    #     isOwner = self.settings.isOwner(ctx.author)
+    #     if isOwner == False:
+    #         return
+    #     # We're admin
+    #     if not prefix:
+    #         self.settings.setServerStat(ctx.guild, "Prefix", None)
+    #         msg = 'Custom server prefix telah *dihapus*.'
+    #     elif prefix in ['@everyone','@here']:
+    #         return await ctx.send("Bagus, pintar sekali..!\njadi lebih mudah dan simpel..\n**PAKAI PREFIX LAIN!**")
+    #     elif prefix in ['acx ']:
+    #         self.settings.setServerStat(ctx.guild, "Prefix", prefix)
+    #         msg = 'Custom server prefix menjadi: `{}`'.format(prefix)
+    #     elif len(prefix) > 3:
+    #         return await ctx.send("┐(￣ヘ￣;)┌\nprefix tidak dapat lebih dari 3, kecuali default!")
+    #     else:
+    #         self.settings.setServerStat(ctx.guild, "Prefix", prefix)
+    #         msg = 'Custom server prefix menjadi: `{}`'.format(prefix)
+    #     em = discord.Embed(color = 0XFF8C00, description = msg)
+    #     em.set_footer(text = "{}".format(ctx.author))
+    #     await ctx.send(embed = em)
 
-    @commands.command(pass_context=True)
-    async def getprefix(self, ctx):
-        """Melihat prefix saat ini yang digunakan dalam server mu.
-        Jika lupa,
-        mention bot ini dan ketik `getprefix` untuk mendapatkan prefix diserver mu"""
-        # Get the current prefix
-        prefix = await self.bot.command_prefix(self.bot, ctx.message)
-        prefixlist = ", ".join([x for x in prefix if not x == "<@!{}> ".format(self.bot.user.id)])
-        msg = 'Prefix{} bot dalam server ini: {}'.format("" if len(prefix) > 1 else "",prefixlist)
-        em = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author))
-        await ctx.send(embed = em)
+    # @commands.command(pass_context=True)
+    # async def getprefix(self, ctx):
+    #     """Melihat prefix saat ini yang digunakan dalam server mu.
+    #     Jika lupa,
+    #     mention bot ini dan ketik `getprefix` untuk mendapatkan prefix diserver mu"""
+    #     # Get the current prefix
+    #     prefix = await self.bot.command_prefix(self.bot, ctx.message)
+    #     prefixlist = ", ".join([x for x in prefix if not x == "<@!{}> ".format(self.bot.user.id)])
+    #     msg = 'Prefix{} bot dalam server ini: {}'.format("" if len(prefix) > 1 else "",prefixlist)
+    #     em = discord.Embed(color = 0XFF8C00, description = msg)
+    #     em.set_footer(text = "{}".format(ctx.author))
+    #     await ctx.send(embed = em)
     
     # @commands.command(pass_context=True)
     # async def autopcpp(self, ctx, *, setting : str = None):

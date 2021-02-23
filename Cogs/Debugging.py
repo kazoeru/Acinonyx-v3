@@ -468,7 +468,15 @@ class Debugging(commands.Cog):
 
     @commands.command(pass_context=True)
     async def clean(self, ctx, messages = None, *, chan : discord.TextChannel = None):
-        """Menghapus jumlah pesan yang diminta dalam channel yang di tentukan (admin only)."""
+        """Menghapus jumlah pesan yang diminta dalam channel yang di tentukan (admin only).
+        
+        __Update fitur 16 januari 2020__
+        Menghapus pesan dalam jumlaj yang diminta
+        lalu membuat file backup dan mengirimkan file.txt dalam pesan DM.
+        
+        *file.txt berisi nama user dan isi pesan.
+        
+        **File tidak akan dikirimkan jika kamu mematikan fitur direct message dalam server mu."""
         if not await Utils.is_bot_admin_reply(ctx): return
 
         if not chan:

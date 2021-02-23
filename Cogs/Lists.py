@@ -442,7 +442,18 @@ class Lists(commands.Cog):
         
     @commands.command(pass_context=True)
     async def online(self, ctx):
-        """Menampilkan jumlah member online dalam server."""
+        """**INDONESIA**
+        Menampilkan jumlah member online dalam server.
+        
+        **ENGLISH**
+        Lists the number of users online."""
+        cekAuthor = ctx.author
+        checkLang = self.settings.getUserStat(cekAuthor, ctx.guild, "Language")
+        
+        #kalo belum ada language
+        if checkLang == None:
+            await self.language_not_set(ctx)
+        
         members = membersOnline = bots = botsOnline = 0
         for member in ctx.guild.members:
             if member.bot:
@@ -453,68 +464,172 @@ class Lists(commands.Cog):
                 members += 1
                 if not member.status == discord.Status.offline:
                     membersOnline += 1
-
-        await Message.Embed(
-            title="Member Stats",
-            description="Informasi member online server ***{}***".format(ctx.guild.name),
-            fields=[
-                { "name" : "Member", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2)), "inline" : False},
-                { "name" : "Bot", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2)), "inline" : False},
-                { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline + botsOnline, len(ctx.guild.members), round(((membersOnline + botsOnline)/len(ctx.guild.members))*100, 2)), "inline" : False}
-            ],
-            color=0XFF8C00,
-            footer="{}#{}".format(ctx.author.name, ctx.author.discriminator),
-            icon_url = "{}".format(ctx.author.avatar_url)).send(ctx)
+        if checkLang == "ID":
+            await Message.Embed(
+                title="Member Stats",
+                description="Informasi member online server ***{}***".format(ctx.guild.name),
+                fields=[
+                    { "name" : "Member", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2)), "inline" : False},
+                    { "name" : "Bot", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2)), "inline" : False},
+                    { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline + botsOnline, len(ctx.guild.members), round(((membersOnline + botsOnline)/len(ctx.guild.members))*100, 2)), "inline" : False}
+                ],
+                color=0XFF8C00,
+                footer="{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                icon_url = "{}".format(ctx.author.avatar_url)).send(ctx)
+        if checkLang == "EN":
+            await Message.Embed(
+                title="Member Stats",
+                description="Current member information for ***{}***".format(ctx.guild.name),
+                fields=[
+                    { "name" : "Member", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline, members, round((membersOnline/members)*100, 2)), "inline" : False},
+                    { "name" : "Bot", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(botsOnline, bots, round((botsOnline/bots)*100, 2)), "inline" : False},
+                    { "name" : "Total", "value" : "└─ {:,}/{:,} online ({:,g}%)".format(membersOnline + botsOnline, len(ctx.guild.members), round(((membersOnline + botsOnline)/len(ctx.guild.members))*100, 2)), "inline" : False}
+                ],
+                color=0XFF8C00,
+                footer="{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                icon_url = "{}".format(ctx.author.avatar_url)).send(ctx)
 
 
     @commands.command(pass_context=True)
     async def lastonline(self, ctx, *, member = None):
-        """Melihat member terakhir online.
+        """**INDONESIA**
+        Melihat member terakhir online.
+        
+        **ENGLISH**
+        Lists the last time a user was online.
 
-        Contoh:
-        acx!lastonline @[ACX] NvStar
-        acx!lastonline [ACX] NvStar#9110"""
+        Contoh \ Example:
+        acx lastonline @ACX•NvStar
+        acx lastonline ACX•NvStar#9110
+        acx lastonline ACX•NvStar
+        """
+        cekAuthor = ctx.author
+        checkLang = self.settings.getUserStat(cekAuthor, ctx.guild, "Language")
+        
+        #kalo belum ada language
+        if checkLang == None:
+            await self.language_not_set(ctx)
+        
         if not member:
-        em = discord.Embed(color = 0XFF8C00, description =  "Melihat informasi member terakhir online\n\n"
-                                                            "**Panduan**\n"
-                                                            "`{}lastonline [member]`\n\n"
-                                                            "**Note:**\n"
-                                                            "*`member` dapat berupa mention, nama, atau nickname.*\n"
-                                                            "*ketik `{}help lastonline` untuk informasi lebih lanjut.*"
-                                                            .format(ctx.prefix,
-                                                                    ctx.prefix))
-            em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\n{}#{}".format(ctx.author.name, ctx.author.discriminator),
-                          icon_url = "{}".format(ctx.author.avatar_url))
-            return await ctx.send(embed = em)
+            if checkLang == "ID":
+                em = discord.Embed(color = 0XFF8C00, description =  "Melihat informasi member terakhir online\n\n"
+                                                                    "**Panduan**\n"
+                                                                    "*`{}lastonline [member]`*\n\n"
+                                                                    "*Catatan:*"
+                                                                    "*`member` dapat berupa mention, nama, atau nickname.*\n"
+                                                                    "*ketik `{}help lastonline` untuk informasi lebih lanjut.*"
+                                                                    .format(ctx.prefix,
+                                                                            ctx.prefix))
+                em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\n{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                              icon_url = "{}".format(ctx.author.avatar_url))
+                return await ctx.send(embed = em)
+
+            if checkLang == "EN":
+                msg  = "Lists the last time a user was online.\n\n"
+                msg += "**Usage**\n"
+                msg += "*`{}lastonline [member]`*\n\n".format(ctx.prefix)
+                msg += "*Note : you can type `member` as mention someone, nickname, or username.*"
+                em = discord.Embed(color = 0XFF8C00, description = msg)
+                em.set_footer(text = "When typing commands, you don't need to use the [] sign\n{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                              icon_url = "{}".format(ctx.author.avatar_url))
+                return await ctx.send(embed = em)
 
         if type(member) is str:
             memberName = member
             member = DisplayName.memberForName(memberName, ctx.guild)
             if not member:
-                msg = '┐(￣ヘ￣;)┌\nAku tidak dapat menemukan *{}*...'.format(memberName)
-                em = discord.Embed(color = 0XFF8C00, description = msg)
-                em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
-                              icon_url = "{}".format(ctx.author.avatar_url))
-                await ctx.send(embed = em)
-                #return await ctx.send(Utils.suppressed(ctx,msg))
+                if checkLang == "ID":
+                    msg = '┐(￣ヘ￣;)┌\nAku tidak dapat menemukan *{}*...'.format(memberName)
+                    em = discord.Embed(color = 0XFF8C00, description = msg)
+                    em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                                  icon_url = "{}".format(ctx.author.avatar_url))
+                    return await ctx.send(embed = em)
+                    #return await ctx.send(Utils.suppressed(ctx,msg))
+                
+                if checkLang == "EN":
+                    msg = '┐(￣ヘ￣;)┌\nI can\'t find *{}*...'.format(memberName)
+                    em = discord.Embed(color = 0XFF8C00, description = msg)
+                    em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                                  icon_url = "{}".format(ctx.author.avatar_url))
+                    return await ctx.send(embed = em)
         
         name = DisplayName.name(member)
-        
-        # We have a member here
+
+        # lanjut kebawah ini kalo sudah pilih bahasa
         if not member.status == discord.Status.offline:
-            msg = '*{}* sedang online.'.format(member.mention)
+            if checkLang == "ID":
+                msg = '*{}* sedang online.'.format(member.mention)
+            if checkLang == "EN":
+                msg = '*{}* is online.'.format(member.mention)
         else:
             lastOnline = self.settings.getUserStat(member, ctx.guild, "LastOnline")
             if lastOnline == "Unknown":
                 self.settings.setUserStat(member, ctx.guild, "LastOnline", None)
                 lastOnline = None
             if lastOnline:
-                currentTime = int(time.time())
-                timeString  = ReadableTime.getReadableTimeBetween(int(lastOnline), currentTime, True)
-                msg = 'Terakhir aku lihat {} online\n*{} yang lalu*.'.format(member.mention, timeString)
+                if checkLang == "ID":
+                    currentTime = int(time.time())
+                    timeString  = ReadableTime.getReadableTimeBetween(int(lastOnline), currentTime, True)
+                    msg = 'Terakhir aku lihat {} online\n*{} yang lalu*.'.format(member.mention, timeString)
+                if checkLang == "EN":
+                    currentTime = int(time.time())
+                    timeString  = ReadableTime.getReadableTimeBetweenEng(int(lastOnline), currentTime, True)
+                    msg = 'The last time I saw *{}* was\n*{} ago*'.format(member.mention, timeString)
             else:
-                msg = '┐(￣ヘ￣;)┌\nAku tidak tau kapan *{}* terakhir online.'.format(member.mention)
+                if checkLang == "ID":
+                    msg = '┐(￣ヘ￣;)┌\nAku tidak tau kapan *{}* terakhir online.'.format(member.mention)
+                if checkLang == "EN":
+                    msg = '┐(￣ヘ￣;)┌\nI don\'t know when *{}* was last online.'.format(member.mention)
         em = discord.Embed(color = 0XFF8C00, description = msg)
         em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
                       icon_url = "{}".format(ctx.author.avatar_url))
         await ctx.send(embed = em)
+
+    async def language_not_set(self, ctx):
+        msg  = "<:indonesia:798977282886467635> **INDONESIA**\n"
+        msg += "Kamu belum mengatur bahasa untuk bot ini.\n\n"
+        msg += "<:English:798978134711599125> **ENGLISH**\n"
+        msg += "You haven't set the language for this bot.\n\n"
+        msg += "*Pilih dibawah ini / Select it below*"
+
+        em = discord.Embed(color = 0XFF8C00, description = msg)
+        em.set_footer(text = "{}".format(ctx.author),
+                      icon_url = "{}".format(ctx.author.avatar_url))
+        msg = await ctx.send(embed = em, delete_after = 15)
+        await msg.add_reaction('<:indonesia:798977282886467635>')
+        await msg.add_reaction('<:English:798978134711599125>')
+
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for(event='reaction_add',)
+                if user == ctx.author:
+                    emoji = str(reaction.emoji)
+                    if emoji == '<:indonesia:798977282886467635>':
+                        await msg.delete()
+
+                        member = ctx.author
+                        self.settings.setUserStat(member, ctx.guild, "Language", "ID")
+
+                        msg  = "o(>ω<)o Horeeee~!\n"
+                        msg += "Kamu telah mengatur bot ini dengan bahasa indonesia.\n"
+                        msg += "Silahkan ulangi command yang baru saja kamu gunakan."
+                        em = discord.Embed(color = 0XFF8C00, description = msg)
+                        em.set_footer(text = "{}".format(ctx.author),
+                                      icon_url = "{}".format(ctx.author.avatar_url))
+                        await ctx.send(embed = em)
+
+                    if emoji == '<:English:798978134711599125>':
+                        await msg.delete()
+
+                        member = ctx.author
+                        self.settings.setUserStat(member, ctx.guild, "Language", "EN")
+
+                        msg  = "o(>ω<)o Yaaaaay~!\n"
+                        msg += "You have configured this bot in English.\n"
+                        msg += "Please repeat the command that you just used."
+                        em = discord.Embed(color = 0XFF8C00, description = msg)
+                        em.set_footer(text = "{}".format(ctx.author),
+                                      icon_url = "{}".format(ctx.author.avatar_url))
+                        await ctx.send(embed = em)
+            except Exception as e:
+                await msg.send("```\n{}\n```".format(e))

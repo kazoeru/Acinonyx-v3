@@ -88,3 +88,40 @@ def getReadableTimeBetween(first, last, reverse=False):
         return "0 detik"
     else:
         return msg[:-2]	
+
+def getReadableTimeBetweenEng(first, last, reverse=False):
+    # A helper function to make a readable string between two times
+    timeBetween = int(last-first)
+    now = datetime.datetime.now()
+    year = now.year
+    month = now.month
+
+    timeBetween, years, year = get_years(timeBetween, year, reverse)
+    timeBetween, months = get_months(timeBetween, year, month, reverse)
+    
+    weeks   = int(timeBetween/604800)
+    days    = int((timeBetween-(weeks*604800))/86400)
+    hours   = int((timeBetween-(days*86400 + weeks*604800))/3600)
+    minutes = int((timeBetween-(hours*3600 + days*86400 + weeks*604800))/60)
+    seconds = int(timeBetween-(minutes*60 + hours*3600 + days*86400 + weeks*604800))
+    msg = ""
+    
+    if years > 0:
+        msg += "1 year, " if years == 1 else "{:,} years, ".format(years)
+    if months > 0:
+        msg += "1 month, " if months == 1 else "{:,} months, ".format(months)
+    if weeks > 0:
+        msg += "1 week, " if weeks == 1 else "{:,} weeks, ".format(weeks)
+    if days > 0:
+        msg += "1 day, " if days == 1 else "{:,} days, ".format(days)
+    if hours > 0:
+        msg += "1 hour, " if hours == 1 else "{:,} hours, ".format(hours)
+    if minutes > 0:
+        msg += "1 minute, " if minutes == 1 else "{:,} minutes, ".format(minutes)
+    if seconds > 0:
+        msg += "1 second, " if seconds == 1 else "{:,} seconds, ".format(seconds)
+
+    if msg == "":
+        return "0 second"
+    else:
+        return msg[:-2] 

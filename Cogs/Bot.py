@@ -7,34 +7,24 @@ try:
 except ImportError:
     from urlparse import urlparse
 
-todo_list = """```**BUAT ROLE MUTE**
-• Membuat command untuk Mute Role
-  └─ Admin server dapat membuat atau memilih
-     role untuk Mute Role
+todo_list = """```
+On-progress project
 
-  └─ Cara Kerja command
-     • Sebelum bot membuat role, pastikan bot
-          harus memiliki izin, return jika tidak.
-        
-     • Cek terlebih dahulu, apakah server tsb
-          Sudah memiliki Mute Role yang telah di setting?
-          Jika sudah Update setting yang baru.
-        
-     • Buat role dari function `create_role`
-       dengan menonaktifkan function sebagai berikut:
-       *CHANNEL*
-        └─ send_message
-        └─ add_reaction
-       *VOICE CHANNEL*
-        └─ speak_overtides
-        (Jika server admin memilih Mute Role yang sudah
-        tersedia lewati langkah ini)
-        
-     • Scan semua channel pada server
-       dan menerapkan role yang telah
-       dibuat pada semua channel dalam server 
-```"""
+**MULTI LANGUAGE**
+  • INDONESIA
+  • ENGLISH
 
+Major update, this feature will upgrade the bot to version 4.
+This project will take a long time, cuz i work by my self without crewmate.
+
+Finished features by category:
+• Lists.py
+• Osu.py
+• Admin.py
+• Ascii.py
+• Bot Admin (15.3%)
+```
+"""
 def setup(bot):
     # Add the bot and deps
     settings = bot.get_cog("Settings")
@@ -243,7 +233,7 @@ class Bot(commands.Cog):
         before_typing = time.monotonic()
         await ctx.trigger_typing()
         after_typing = time.monotonic()
-        ms = int((after_typing - before_typing) * 1000)
+        ms = round((after_typing - before_typing) * 1000)
         msg = '*{}*, ***PONG!*** (~{}ms)'.format(ctx.message.author.mention, ms)
         em = discord.Embed(color = 0XFF8C00, description = msg)
         em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
@@ -252,7 +242,7 @@ class Bot(commands.Cog):
         
     @commands.command(pass_context=True)
     async def nickname(self, ctx, *, name : str = None):
-        """Merubah nama bot dalam server(admin server-only)."""
+        """Merubah nama ku dalam server(admin server-only)."""
         
         if not await Utils.is_admin_reply(ctx): return
         
@@ -399,13 +389,13 @@ class Bot(commands.Cog):
 
         if embed == None:
             em = discord.Embed(color = 0XFF8C00,
-                               description = "Build embed menggunakan json."
+                               description = "Build embed menggunakan json.\n"
                                              "**Panduan penggunaan**\n"
                                              "`{}embed [type] [embed json]`\n\n"
                                              "*Ketik `{}help embed` untuk melihat informasi lebih lanjut*"
                                              .format(ctx.prefix,
                                                      ctx.prefix))
-            em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\n{}#{}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
+            em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\n{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
             return await ctx.send(embed=em)
         embed_type = embed.split()[0].lower() if embed.split()[0].lower() in ["field","text"] else "field"
         try:
@@ -995,13 +985,11 @@ class Bot(commands.Cog):
         await ctx.send(embed = em)
 
     @commands.command(pass_context=True)
-    async def todolist(self, ctx):
-        isOwner = self.settings.isOwner(ctx.author)
-        if isOwner == False:
-            return await ctx.send("┐(￣ヘ￣;)┌")
+    async def project(self, ctx):
+        #isOwner = self.settings.isOwner(ctx.author)
+        #if isOwner == False:
+        #    return await ctx.send("┐(￣ヘ￣;)┌")
         em = discord.Embed(color = 0XFF8C00, description = "{}".format(todo_list))
-        em.set_author(name = "OWNER TODO LIST")
-        em.set_footer(text = "JANGAN MALAS CUK")
         await ctx.send(embed = em)
 
     # Helper function to get extensions

@@ -18,27 +18,36 @@ class Osu(commands.Cog):
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
 
-    @commands.command()
-    async def osuprint(self, ctx, player = None):
-        """Print out json api osu(Owner-only)"""
-        isOwner = self.settings.isOwner(ctx.author)
-        if isOwner == False:
-            msg = "Siapa yaa?"
-            em = discord.Embed(description = msg)
-            return await ctx.send(embed = em)
+    # @commands.command()
+    # async def osuprint(self, ctx, player = None):
+    #     """Print out json api osu(Owner-only)"""
+    #     isOwner = self.settings.isOwner(ctx.author)
+    #     if isOwner == False:
+    #         msg = "Siapa yaa?"
+    #         em = discord.Embed(description = msg)
+    #         return await ctx.send(embed = em)
 
-        playerCheck = requests.get("https://osu.ppy.sh/api/get_user_recent?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}&m=0&limit=1".format(player))
-        data = playerCheck.text
-        data = json.loads(data)
-        dataPlayer = data
-        await ctx.send("```\n{}\n```".format(dataPlayer))
+    #     playerCheck = requests.get("https://osu.ppy.sh/api/get_user_recent?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}&m=0&limit=1".format(player))
+    #     data = playerCheck.text
+    #     data = json.loads(data)
+    #     dataPlayer = data
+    #     await ctx.send("```\n{}\n```".format(dataPlayer))
 
     @commands.command()
     async def setosu(self, ctx, *, player = None):
-        """Set osu player mu dalam server ini.
-        *Contoh*
+        """**INDONESIA**
+        Set Osu!Player mu dalam server ini.
+        
+        **ENGLISH**
+        Set your Osu!Player in this server
+        
+        Contoh / Example:
         acx setosu kazereborn"""
         checkData = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "OsuPlayer")
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == None:
+            await self.language_not_set(ctx)
+
         if checkData is not None:
           try:
             playerCheck = requests.get("https://osu.ppy.sh/api/get_user?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}".format(checkData))
@@ -48,98 +57,193 @@ class Osu(commands.Cog):
             userId = dataPlayer[0]["user_id"]
             username = dataPlayer[0]["username"]
 
-            msg =  "Osu player kamu dalam server ini\n"
-            msg += "*Player : {}*\n".format(username)
-            msg += "*Id : {}*\n\n".format(userId)
-            msg += "Ketik *`ya`* untuk menghapus player osu kamu"
-            em = discord.Embed(color = 0XFF8C00,
-                               description = msg)
-            em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
-            em.add_field(name = "**HOMEPAGE**",
-                         value = "https://osu.ppy.sh/users/{}".format(userId))
-            em.set_footer(text = "{}".format(ctx.author),
-                          icon_url = "{}".format(ctx.author.avatar_url))
-            Msg = await ctx.send(embed = em)
-            confirm = ['ya']
-            try:
-                msg = await self.bot.wait_for('message', timeout=15, check=lambda msg: msg.author == ctx.author)
-            except:
+            if LangCheck == "ID":
                 msg =  "Osu player kamu dalam server ini\n"
                 msg += "*Player : {}*\n".format(username)
-                msg += "*Id : {}*".format(userId)
-                em = discord.Embed(color = 0XFF8C00, description = msg)
+                msg += "*Id : {}*\n\n".format(userId)
+                msg += "Ketik *`ya`* untuk menghapus player osu kamu"
+                em = discord.Embed(color = 0XFF8C00,
+                                   description = msg)
+                em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
                 em.add_field(name = "**HOMEPAGE**",
                              value = "https://osu.ppy.sh/users/{}".format(userId))
-                em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
+                em.set_footer(text = "{}".format(ctx.author),
+                              icon_url = "{}".format(ctx.author.avatar_url))
+                Msg = await ctx.send(embed = em)
+                confirm = ['ya']
+                try:
+                    msg = await self.bot.wait_for('message', timeout=15, check=lambda msg: msg.author == ctx.author)
+                except:
+                    msg =  "Osu player kamu dalam server ini\n"
+                    msg += "*Player : {}*\n".format(username)
+                    msg += "*Id : {}*".format(userId)
+                    em = discord.Embed(color = 0XFF8C00, description = msg)
+                    em.add_field(name = "**HOMEPAGE**",
+                                 value = "https://osu.ppy.sh/users/{}".format(userId))
+                    em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
+                    em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                                  icon_url = "{}".format(ctx.author.avatar_url))
+                    return await Msg.edit(embed = em)
+                message = str(msg.content.lower())
+
+                if message not in confirm and message not in ['ya']:
+                    msgDone =  "Osu player kamu dalam server ini\n"
+                    msgDone += "*Player : {}*\n".format(username)
+                    msgDone += "*Id : {}*".format(userId)
+                    em = discord.Embed(color = 0XFF8C00, description = msgDone)
+                    em.add_field(name = "**HOMEPAGE**",
+                                value = "https://osu.ppy.sh/users/{}".format(userId))
+                    em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
+                    em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                                  icon_url = "{}".format(ctx.author.avatar_url))
+                    return await Msg.edit(embed = em)
+
+                await Msg.delete()
+                msg =  "Kamu telah manghapus Player Osu diserver ini.\n"
+                msg += "Silahkan ketik *`{}setosu [player]`* untuk mengatur Osu player mu kembali".format(ctx.prefix)
+                em = discord.Embed(color = 0XFF8C00, description = msg)
                 em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
                               icon_url = "{}".format(ctx.author.avatar_url))
-                return await Msg.edit(embed = em)
-            message = str(msg.content.lower())
+                self.settings.setUserStat(ctx.message.author, ctx.message.guild, "OsuPlayer", None)
+                return await ctx.send(embed = em)
 
-            if message not in confirm and message not in ['ya']:
-                msgDone =  "Osu player kamu dalam server ini\n"
-                msgDone += "*Player : {}*\n".format(username)
-                msgDone += "*Id : {}*".format(userId)
-                em = discord.Embed(color = 0XFF8C00, description = msgDone)
+            if LangCheck == "EN":
+                msg =  "Your Osu!Player in this server is\n"
+                msg += "*Player : {}*\n".format(username)
+                msg += "*Id : {}*\n\n".format(userId)
+                msg += "Type *`clear`* to delete your Osu!Player in this server."
+                em = discord.Embed(color = 0XFF8C00,
+                                   description = msg)
+                em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
                 em.add_field(name = "**HOMEPAGE**",
-                            value = "https://osu.ppy.sh/users/{}".format(userId))
-                em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
+                             value = "https://osu.ppy.sh/users/{}".format(userId))
+                em.set_footer(text = "{}".format(ctx.author),
+                              icon_url = "{}".format(ctx.author.avatar_url))
+                Msg = await ctx.send(embed = em)
+                confirm = ['clear']
+                try:
+                    msg = await self.bot.wait_for('message', timeout=15, check=lambda msg: msg.author == ctx.author)
+                except:
+                    msg =  "Your Osu!Player in this server is\n"
+                    msg += "*Player : {}*\n".format(username)
+                    msg += "*Id : {}*".format(userId)
+                    em = discord.Embed(color = 0XFF8C00, description = msg)
+                    em.add_field(name = "**HOMEPAGE**",
+                                 value = "https://osu.ppy.sh/users/{}".format(userId))
+                    em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
+                    em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                                  icon_url = "{}".format(ctx.author.avatar_url))
+                    return await Msg.edit(embed = em)
+                message = str(msg.content.lower())
+
+                if message not in confirm and message not in ['clear']:
+                    msgDone =  "Your Osu!Player in this server is\n"
+                    msgDone += "*Player : {}*\n".format(username)
+                    msgDone += "*Id : {}*".format(userId)
+                    em = discord.Embed(color = 0XFF8C00, description = msgDone)
+                    em.add_field(name = "**HOMEPAGE**",
+                                value = "https://osu.ppy.sh/users/{}".format(userId))
+                    em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
+                    em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
+                                  icon_url = "{}".format(ctx.author.avatar_url))
+                    return await Msg.edit(embed = em)
+
+                await Msg.delete()
+                msg =  "You have deleted your Osu!Player in this server.\n"
+                msg += "Please type *`{}setosu [player]`* to set your Osu!Player in this server.".format(ctx.prefix)
+                em = discord.Embed(color = 0XFF8C00, description = msg)
                 em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
                               icon_url = "{}".format(ctx.author.avatar_url))
-                return await Msg.edit(embed = em)
-
-            await Msg.delete()
-            msg =  "Kamu telah manghapus Player Osu diserver ini.\n"
-            msg += "Silahkan ketik *`{}setosu [player]`* untuk mengatur Osu player mu kembali".format(ctx.prefix)
-            em = discord.Embed(color = 0XFF8C00, description = msg)
-            em.set_footer(text = "{}#{}".format(ctx.author.name, ctx.author.discriminator),
-                          icon_url = "{}".format(ctx.author.avatar_url))
-            self.settings.setUserStat(ctx.message.author, ctx.message.guild, "OsuPlayer", None)
-            return await ctx.send(embed = em)
+                self.settings.setUserStat(ctx.message.author, ctx.message.guild, "OsuPlayer", None)
+                return await ctx.send(embed = em)
 
           except Exception as e:
             print (e)
-            msg = "┐(￣ヘ￣;)┌\nPlayer yang kamu masukan tidak terdaftar"
-            em = discord.Embed(color = 0XFF8C00,
-                               description = msg)
-            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-            await ctx.send(embed = em)
+            if LangCheck == "ID":
+                msg = "┐(￣ヘ￣;)┌\nPlayer yang kamu masukan tidak terdaftar."
+                em = discord.Embed(color = 0XFF8C00,
+                                   description = msg)
+                em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+                await ctx.send(embed = em)
+
+            if LangCheck == "ID":
+                msg = "┐(￣ヘ￣;)┌\nLooks like player that you entered is not registered."
+                em = discord.Embed(color = 0XFF8C00,
+                                   description = msg)
+                em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+                await ctx.send(embed = em)
         
         try:
           if player == None:
             return await self.player_not_found(ctx)
             
           try:
-            playerCheck = requests.get("https://osu.ppy.sh/api/get_user?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}".format(player))
-            data = playerCheck.text
-            data = json.loads(data)
-            dataPlayer = data
-            userId = dataPlayer[0]["user_id"]
-            username = dataPlayer[0]["username"]
-            self.settings.setUserStat(ctx.message.author, ctx.message.guild, "OsuPlayer", userId)
-            msg =  "Kamu telah mengatur osu player untuk server ini\n"
-            msg += "*Player : {}*\n".format(username)
-            msg += "*ID : {}*".format(userId)
-            em = discord.Embed(color = 0XFF8C00,
-                               description = "{}".format(msg))
-            em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
-            em.add_field(name = "**HOMEPAGE**",
-                         value = "https://osu.ppy.sh/users/{}".format(userId))
-            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-            await ctx.send(embed = em)
+            if LangCheck == "ID":
+                playerCheck = requests.get("https://osu.ppy.sh/api/get_user?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}".format(player))
+                data = playerCheck.text
+                data = json.loads(data)
+                dataPlayer = data
+                userId = dataPlayer[0]["user_id"]
+                username = dataPlayer[0]["username"]
+                self.settings.setUserStat(ctx.message.author, ctx.message.guild, "OsuPlayer", userId)
+                msg =  "Kamu telah mengatur osu player untuk server ini\n"
+                msg += "*Player : {}*\n".format(username)
+                msg += "*ID : {}*".format(userId)
+                em = discord.Embed(color = 0XFF8C00,
+                                   description = "{}".format(msg))
+                em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
+                em.add_field(name = "**HOMEPAGE**",
+                             value = "https://osu.ppy.sh/users/{}".format(userId))
+                em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+                await ctx.send(embed = em)
+
+            if LangCheck == "EN":
+                playerCheck = requests.get("https://osu.ppy.sh/api/get_user?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}".format(player))
+                data = playerCheck.text
+                data = json.loads(data)
+                dataPlayer = data
+                userId = dataPlayer[0]["user_id"]
+                username = dataPlayer[0]["username"]
+                self.settings.setUserStat(ctx.message.author, ctx.message.guild, "OsuPlayer", userId)
+                msg =  "You have set your Osu!Player for this server.\n"
+                msg += "*Player : {}*\n".format(username)
+                msg += "*ID : {}*".format(userId)
+                em = discord.Embed(color = 0XFF8C00,
+                                   description = "{}".format(msg))
+                em.set_thumbnail(url = "http://s.ppy.sh/a/{}".format(userId))
+                em.add_field(name = "**HOMEPAGE**",
+                             value = "https://osu.ppy.sh/users/{}".format(userId))
+                em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+                await ctx.send(embed = em)
           except Exception as e:
-            msg = "┐(￣ヘ￣;)┌\nPlayer yang kamu masukan tidak terdaftar"
-            em = discord.Embed(color = 0XFF8C00,
-                               description = msg)
-            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-            await ctx.send(embed = em)
+            if LangCheck == "ID":
+                msg = "┐(￣ヘ￣;)┌\nPlayer yang kamu masukan tidak terdaftar"
+                em = discord.Embed(color = 0XFF8C00,
+                                   description = msg)
+                em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+                await ctx.send(embed = em)
+
+            if LangCheck == "EN":
+                msg = "┐(￣ヘ￣;)┌\nLooks like player that you entered is not registered"
+                em = discord.Embed(color = 0XFF8C00,
+                                   description = msg)
+                em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+                await ctx.send(embed = em)
         except Exception as e:
             print (e)
-            await ctx.send("```\n{}\n```".format(e))
+            await ctx.send("**ERROR**\n```\n{}\n```".format(e))
 
-    @commands.command(aliases = ["osu"])
-    async def std(self, ctx, *, player = None):
-        """Cek informasi player Osu!standard."""
+    @commands.command(aliases = ["std"])
+    async def osu(self, ctx, *, player = None):
+        """**INDONESIA**
+        Cek informasi player Osu!Standard.
+        
+        **ENGLISH**
+        Check player information Osu!Standard."""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == None:
+            await self.language_not_set(ctx)
+
         if type(player) == str:
             playerName = player
             await self.std_statistic(ctx, playerName)
@@ -155,7 +259,15 @@ class Osu(commands.Cog):
 
     @commands.command()
     async def taiko(self, ctx, *, player = None):
-        """Cek informasi player Osu!Taiko."""
+        """**INDONESIA**
+        Cek informasi player Osu!Taiko.
+        
+        **ENGLISH**
+        Check player information Osu!Taiko."""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == None:
+            await self.language_not_set(ctx)
+
         if type(player) == str:
             playerName = player
             await self.taiko_statistic(ctx, playerName)
@@ -171,7 +283,15 @@ class Osu(commands.Cog):
         
     @commands.command()
     async def ctb(self, ctx, *, player = None):
-        """Cek informasi player Osu!Catch."""
+        """**INDONESIA**
+        Cek informasi player Osu!Catch.
+        
+        **ENGLISH**
+        Check player information Osu!Catch."""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == None:
+            await self.language_not_set(ctx)
+
         if type(player) == str:
             playerName = player
             await self.ctb_statistic(ctx, playerName)
@@ -187,7 +307,15 @@ class Osu(commands.Cog):
         
     @commands.command()
     async def mania(self, ctx, *, player = None):
-        """Cek informasi player Osu!Mania."""
+        """**INDONESIA**
+        Cek informasi player Osu!Mania.
+        
+        **ENGLISH**
+        Check player information Osu!Mania."""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == None:
+            await self.language_not_set(ctx)
+
         if type(player) == str:
             playerName = player
             await self.mania_statistic(ctx, playerName)
@@ -204,7 +332,15 @@ class Osu(commands.Cog):
 
     @commands.command(aliases = ["rosu"])
     async def rstd(self, ctx, *, player = None):
-        """Cek recent game Osu!standard."""
+        """**INDONESIA**
+        Cek recent game Osu!Standard.
+        
+        **ENGLISH**
+        Check recent game Osu!Standard."""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == None:
+            await self.language_not_set(ctx)
+
         if type(player) == str:
             playerName = player
             await self.osu_standard_recent(ctx, playerName)
@@ -221,7 +357,15 @@ class Osu(commands.Cog):
 
     @commands.command()
     async def rtaiko(self, ctx, *, player = None):
-        """Cek recent game Osu!Taiko"""
+        """**INDONESIA**
+        Cek recent game Osu!Taiko.
+        
+        **ENGLISH**
+        Check recent game Osu!Taiko"""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == None:
+            await self.language_not_set(ctx)
+
         if type(player) == str:
             playerName = player
             await self.taiko_standard_recent(ctx, playerName)
@@ -238,7 +382,15 @@ class Osu(commands.Cog):
 
     @commands.command(aliases = ["rctb"])
     async def rcatch(self, ctx, *, player = None):
-        """Cek recent game Osu!Catch"""
+        """**INDONESIA**
+        Cek recent game Osu!Catch.
+        
+        **ENGLISH**
+        Check recent game Osu!Catch."""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == None:
+            await self.language_not_set(ctx)
+
         if type(player) == str:
             playerName = player
             await self.ctb_standard_recent(ctx, playerName)
@@ -255,7 +407,15 @@ class Osu(commands.Cog):
 
     @commands.command()
     async def rmania(self, ctx, *, player = None):
-        """Cek recent game Osu!Mania"""
+        """**INDONESIA**
+        Cek recent game Osu!Mania.
+        
+        **ENGLISH**
+        Check recent game Osu!Mania."""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == None:
+            await self.language_not_set(ctx)
+
         if type(player) == str:
             playerName = player
             await self.mania_standard_recent(ctx, playerName)
@@ -271,19 +431,34 @@ class Osu(commands.Cog):
 
 
     async def player_not_found(self, ctx):
-        msg =  "> Kamu belum mengatur Osu!player dalam server ini.\n"
-        msg += "> Silahkan ketik *`{}setosu [player]`*\n".format(ctx.prefix)
-        msg += "> **Contoh**\n"
-        msg += "> *`{}setosu kazereborn`*".format(ctx.prefix)
-        em = discord.Embed(color = 0XFF8C00,
-                           description = msg)
-        em.set_author(name = "Oops", 
-                      icon_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Osu%21Logo_%282015%29.svg/1200px-Osu%21Logo_%282015%29.svg.png")
-        em.set_footer(text = f"{ctx.author}",
-                      icon_url = f"{ctx.author.avatar_url}")
-        return await ctx.send(embed = em)
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+        if LangCheck == "ID":
+            msg =  "> Kamu belum mengatur Osu!player dalam server ini.\n"
+            msg += "> Silahkan ketik *`{}setosu [player]`*\n".format(ctx.prefix)
+            msg += "> **Contoh**\n"
+            msg += "> *`{}setosu kazereborn`*".format(ctx.prefix)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_author(name = "Oops", 
+                          icon_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Osu%21Logo_%282015%29.svg/1200px-Osu%21Logo_%282015%29.svg.png")
+            em.set_footer(text = f"{ctx.author}",
+                          icon_url = f"{ctx.author.avatar_url}")
+            return await ctx.send(embed = em)
+        if LangCheck == "EN":
+            msg =  "> You have not set your Osu!player in this server.\n"
+            msg += "> Please type *`{}setosu [player]`*\n".format(ctx.prefix)
+            msg += "> **Example**\n"
+            msg += "> *`{}setosu kazereborn`*".format(ctx.prefix)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_author(name = "Oops", 
+                          icon_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Osu%21Logo_%282015%29.svg/1200px-Osu%21Logo_%282015%29.svg.png")
+            em.set_footer(text = f"{ctx.author}",
+                          icon_url = f"{ctx.author.avatar_url}")
+            return await ctx.send(embed = em)
     
     async def std_statistic(self, ctx, player):
+      LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
       try:
         # STATISTIC PLAYER
         r = requests.get("https://osu.ppy.sh/api/get_user?k=526d85b33ad4b0912850229a00e17e91b612d653&m=0&u={}".format(player))
@@ -331,35 +506,67 @@ class Osu(commands.Cog):
         print (countryId)
         flagimg = "https://flagpedia.net/data/flags/w702/{}.webp".format(countryId)
         # EMBED BOT UNTUK STATISTIC PLAYER
-        msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
-        msg += "Level         : {}\n".format(str(rlevel))
-        msg += "Performance   : {}pp\n".format(str(rpp))
-        msg += "Akurasi       : {}%\n".format(str(racc))
-        msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
-        msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
-        msg += "Total Bermain : {}".format(playCount)
-        em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
-        em.set_author(name = "Osu!Standard profile {}".format(str(a[0]["username"])),
-                      icon_url = "{}".format(flagimg))
-        TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
-        TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
-        TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
-        TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
-        TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
-        em.add_field(name = "Total Rank", value = TotalRank)
-        em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
-        em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
-        em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
-        msg = await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
+            msg += "Level         : {}\n".format(str(rlevel))
+            msg += "Performance   : {}pp\n".format(str(rpp))
+            msg += "Akurasi       : {}%\n".format(str(racc))
+            msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
+            msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
+            msg += "Total Bermain : {}".format(playCount)
+            em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
+            em.set_author(name = "Osu!Standard profile {}".format(str(a[0]["username"])),
+                          icon_url = "{}".format(flagimg))
+            TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
+            TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
+            TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
+            TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
+            TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
+            em.add_field(name = "Total Rank", value = TotalRank)
+            em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
+            em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
+            msg = await ctx.send(embed = em)
+        
+        if LangCheck == "EN":
+            msg =  "Player ID     : {}\n".format(str(a[0]["user_id"]))
+            msg += "Level         : {}\n".format(str(rlevel))
+            msg += "Performance   : {}pp\n".format(str(rpp))
+            msg += "Accuracy      : {}%\n".format(str(racc))
+            msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
+            msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
+            msg += "Total Play    : {}".format(playCount)
+            em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
+            em.set_author(name = "Osu!Standard profile {}".format(str(a[0]["username"])),
+                          icon_url = "{}".format(flagimg))
+            TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
+            TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
+            TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
+            TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
+            TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
+            em.add_field(name = "Total Rank", value = TotalRank)
+            em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
+            em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
+            msg = await ctx.send(embed = em)
       except:
-        msg = "Player *`{}`* tidak ditemukan".format(player)
-        em = discord.Embed(color = 0XFF8C00,
-                           description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        return await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg = "Player *`{}`* tidak ditemukan.".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+
+        if LangCheck == "EN":
+            msg = "Player *`{}`* is not found.".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
         
         
     async def taiko_statistic(self, ctx, player):
+      LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
       try:
         # STATISTIC PLAYER
         r = requests.get("https://osu.ppy.sh/api/get_user?k=526d85b33ad4b0912850229a00e17e91b612d653&m=1&u={}".format(player))
@@ -407,34 +614,67 @@ class Osu(commands.Cog):
         print (countryId)
         flagimg = "https://flagpedia.net/data/flags/w702/{}.webp".format(countryId)
         # EMBED BOT UNTUK STATISTIC PLAYER
-        msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
-        msg += "Level         : {}\n".format(str(rlevel))
-        msg += "Performance   : {}pp\n".format(str(rpp))
-        msg += "Akurasi       : {}%\n".format(str(racc))
-        msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
-        msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
-        msg += "Total Bermain : {}".format(playCount)
-        em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
-        em.set_author(name = "Osu!Taiko profile {}".format(str(a[0]["username"])),
-                      icon_url = "{}".format(flagimg))
-        TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
-        TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
-        TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
-        TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
-        TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
-        em.add_field(name = "Total Rank", value = TotalRank)
-        em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
-        em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
-        em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&mode=1&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
-        msg = await ctx.send(embed = em)
-      except:
-        msg = "Player *`{}`* tidak ditemukan".format(player)
-        em = discord.Embed(color = 0XFF8C00,
-                           description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        return await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
+            msg += "Level         : {}\n".format(str(rlevel))
+            msg += "Performance   : {}pp\n".format(str(rpp))
+            msg += "Akurasi       : {}%\n".format(str(racc))
+            msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
+            msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
+            msg += "Total Bermain : {}".format(playCount)
+            em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
+            em.set_author(name = "Osu!Taiko profile {}".format(str(a[0]["username"])),
+                          icon_url = "{}".format(flagimg))
+            TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
+            TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
+            TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
+            TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
+            TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
+            em.add_field(name = "Total Rank", value = TotalRank)
+            em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
+            em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&mode=1&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
+            msg = await ctx.send(embed = em)
         
+        if LangCheck == "EN":
+            msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
+            msg += "Level         : {}\n".format(str(rlevel))
+            msg += "Performance   : {}pp\n".format(str(rpp))
+            msg += "Accuracy      : {}%\n".format(str(racc))
+            msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
+            msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
+            msg += "Total Play    : {}".format(playCount)
+            em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
+            em.set_author(name = "Osu!Taiko profile {}".format(str(a[0]["username"])),
+                          icon_url = "{}".format(flagimg))
+            TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
+            TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
+            TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
+            TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
+            TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
+            em.add_field(name = "Total Rank", value = TotalRank)
+            em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
+            em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&mode=1&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
+            msg = await ctx.send(embed = em)
+      except:
+        if LangCheck == "ID":
+            msg = "Player *`{}`* tidak ditemukan".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+        
+        if LangCheck == "EN":
+            msg = "Player *`{}`* is not found".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+
+
     async def ctb_statistic(self, ctx, player):
+      LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
       try:
         # STATISTIC PLAYER
         r = requests.get("https://osu.ppy.sh/api/get_user?k=526d85b33ad4b0912850229a00e17e91b612d653&m=2&u={}".format(player))
@@ -482,34 +722,66 @@ class Osu(commands.Cog):
         print (countryId)
         flagimg = "https://flagpedia.net/data/flags/w702/{}.webp".format(countryId)
         # EMBED BOT UNTUK STATISTIC PLAYER
-        msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
-        msg += "Level         : {}\n".format(str(rlevel))
-        msg += "Performance   : {}pp\n".format(str(rpp))
-        msg += "Akurasi       : {}%\n".format(str(racc))
-        msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
-        msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
-        msg += "Total Bermain : {}".format(playCount)
-        em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
-        em.set_author(name = "Osu!Catch profile {}".format(str(a[0]["username"])),
-                      icon_url = "{}".format(flagimg))
-        TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
-        TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
-        TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
-        TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
-        TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
-        em.add_field(name = "Total Rank", value = TotalRank)
-        em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
-        em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
-        em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&mode=2&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
-        msg = await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
+            msg += "Level         : {}\n".format(str(rlevel))
+            msg += "Performance   : {}pp\n".format(str(rpp))
+            msg += "Akurasi       : {}%\n".format(str(racc))
+            msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
+            msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
+            msg += "Total Bermain : {}".format(playCount)
+            em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
+            em.set_author(name = "Osu!Catch profile {}".format(str(a[0]["username"])),
+                          icon_url = "{}".format(flagimg))
+            TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
+            TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
+            TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
+            TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
+            TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
+            em.add_field(name = "Total Rank", value = TotalRank)
+            em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
+            em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&mode=2&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
+            msg = await ctx.send(embed = em)
+
+        if LangCheck == "EN":
+            msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
+            msg += "Level         : {}\n".format(str(rlevel))
+            msg += "Performance   : {}pp\n".format(str(rpp))
+            msg += "Accuracy      : {}%\n".format(str(racc))
+            msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
+            msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
+            msg += "Total Play    : {}".format(playCount)
+            em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
+            em.set_author(name = "Osu!Catch profile {}".format(str(a[0]["username"])),
+                          icon_url = "{}".format(flagimg))
+            TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
+            TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
+            TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
+            TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
+            TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
+            em.add_field(name = "Total Rank", value = TotalRank)
+            em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
+            em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&mode=2&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
+            msg = await ctx.send(embed = em)
+
       except:
-        msg = "Player *`{}`* tidak ditemukan".format(player)
-        em = discord.Embed(color = 0XFF8C00,
-                           description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        return await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg = "Player *`{}`* tidak ditemukan".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+        if LangCheck == "EN":
+            msg = "Player *`{}`* is not found".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
         
     async def mania_statistic(self, ctx, player):
+      LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
       try:
         # STATISTIC PLAYER
         r = requests.get("https://osu.ppy.sh/api/get_user?k=526d85b33ad4b0912850229a00e17e91b612d653&m=3&u={}".format(player))
@@ -557,34 +829,66 @@ class Osu(commands.Cog):
         print (countryId)
         flagimg = "https://flagpedia.net/data/flags/w702/{}.webp".format(countryId)
         # EMBED BOT UNTUK STATISTIC PLAYER
-        msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
-        msg += "Level         : {}\n".format(str(rlevel))
-        msg += "Performance   : {}pp\n".format(str(rpp))
-        msg += "Akurasi       : {}%\n".format(str(racc))
-        msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
-        msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
-        msg += "Total Bermain : {}".format(playCount)
-        em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
-        em.set_author(name = "Osu!Mania profile {}".format(str(a[0]["username"])),
-                      icon_url = "{}".format(flagimg))
-        TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
-        TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
-        TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
-        TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
-        TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
-        em.add_field(name = "Total Rank", value = TotalRank)
-        em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
-        em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
-        em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&mode=3&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
-        msg = await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
+            msg += "Level         : {}\n".format(str(rlevel))
+            msg += "Performance   : {}pp\n".format(str(rpp))
+            msg += "Akurasi       : {}%\n".format(str(racc))
+            msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
+            msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
+            msg += "Total Bermain : {}".format(playCount)
+            em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
+            em.set_author(name = "Osu!Mania profile {}".format(str(a[0]["username"])),
+                          icon_url = "{}".format(flagimg))
+            TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
+            TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
+            TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
+            TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
+            TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
+            em.add_field(name = "Total Rank", value = TotalRank)
+            em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
+            em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&mode=3&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
+            msg = await ctx.send(embed = em)
+
+        if LangCheck == "EN":
+            msg =  "ID Player     : {}\n".format(str(a[0]["user_id"]))
+            msg += "Level         : {}\n".format(str(rlevel))
+            msg += "Performance   : {}pp\n".format(str(rpp))
+            msg += "Accuracy      : {}%\n".format(str(racc))
+            msg += "Global Rank   : #{}\n".format(str(a[0]["pp_rank"]))
+            msg += "Local Rank    : {}#{}\n".format(country, str(a[0]["pp_country_rank"]))
+            msg += "Total Play    : {}".format(playCount)
+            em = discord.Embed(color = 0XFF8C00, description = "```\n{}\n```".format(msg))
+            em.set_author(name = "Osu!Mania profile {}".format(str(a[0]["username"])),
+                          icon_url = "{}".format(flagimg))
+            TotalRank =  "<:ARank:788996704301088779> {}  ".format(a[0]["count_rank_a"])
+            TotalRank += "<:SRank:788996986359251006> {}  ".format(a[0]["count_rank_s"])
+            TotalRank += "<:SHRank:788997286477824022> {}  ".format(a[0]["count_rank_sh"])
+            TotalRank += "<:SSRank:788997396470300712> {}  ".format(a[0]["count_rank_ss"])
+            TotalRank += "<:SSHRank:788997506684026921> {}".format(a[0]["count_rank_ssh"])
+            em.add_field(name = "Total Rank", value = TotalRank)
+            em.add_field(name = "Homepage Link", value = "https://osu.ppy.sh/users/{}".format(str(a[0]["user_id"])), inline = False)
+            em.set_footer(text = f"{ctx.author}", icon_url=ctx.author.avatar_url)
+            em.set_image(url = "http://lemmmy.pw/osusig/sig.php?colour=hexee8833&uname={}&mode=3&removeavmargin&flagshadow&flagstroke&darkheader&darktriangles&opaqueavatar&rankedscore&onlineindicator=undefined&xpbar&xpbarhex".format(str(a[0]["user_id"])))
+            msg = await ctx.send(embed = em)
+
       except:
-        msg = "Player *`{}`* tidak ditemukan".format(player)
-        em = discord.Embed(color = 0XFF8C00,
-                           description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        return await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg = "Player *`{}`* tidak ditemukan".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+        if LangCheck == "EN":
+            msg = "Player *`{}`* is not found".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
         
     async def osu_standard_recent(self, ctx, player):
+      LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
       try:
         #Get recent
         OsuRecent = requests.get("https://osu.ppy.sh/api/get_user_recent?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}&m=0&limit=1".format(player))
@@ -630,10 +934,10 @@ class Osu(commands.Cog):
         modsPP = ''.join(mods)
         modsEmoji = ''.join(modsEmoji)
         #Get PP
-        getPerformance = subprocess.Popen(["python3.8", "console_calc.py", "-l", "https://osu.ppy.sh/b/{}".format(getBeatmap[0]["beatmap_id"]),"-c100","{}".format(n100),"-c50","{}".format(n50),"-m","{}".format(nMiss),"-c","{}".format(getBeatmap[0]["max_combo"]), "-acc", "{}".format(totalAcc), "-mods", "{}".format(modsPP)], stdout = subprocess.PIPE).communicate()[0]
-        getPerformance = json.loads(json.dumps(eval(getPerformance)))
-        performance = getPerformance["pp"]
-        print (getPerformance)
+        # getPerformance = subprocess.Popen(["python3.8", "console_calc.py", "-l", "https://osu.ppy.sh/b/{}".format(getBeatmap[0]["beatmap_id"]),"-c100","{}".format(n100),"-c50","{}".format(n50),"-m","{}".format(nMiss),"-c","{}".format(getBeatmap[0]["max_combo"]), "-acc", "{}".format(totalAcc), "-mods", "{}".format(modsPP)], stdout = subprocess.PIPE).communicate()[0]
+        # getPerformance = json.loads(json.dumps(eval(getPerformance)))
+        # performance = getPerformance["pp"]
+        # print (getPerformance)
         #Lets Build everything
         perfect = getRecent[0]["perfect"]
         getRank = getRecent[0]["rank"]
@@ -658,9 +962,9 @@ class Osu(commands.Cog):
             rankEmoji = "<:FRank:790106142722228256>"
             
         if perfect == "1":
-            msg = "{}\n".format(modsEmoji)
-            msg +=  "{} {} ({}/{})\n".format(rankEmoji, score, combo, getBeatmap[0]["max_combo"])
-            msg += "{}% **PP {}**\n".format(totalAcc, performance)
+            msg =  "{}\n".format(modsEmoji)
+            msg += "{} {} ({}/{})\n".format(rankEmoji, score, combo, getBeatmap[0]["max_combo"])
+            msg += "ACC: {}%\n".format(totalAcc)
             msg += "<:count300:789814804914372633> {}  <:countGeki:789814942785077258> {}  <:count100:789815074507849738> {}  ".format(getRecent[0]["count300"], getRecent[0]["countgeki"], getRecent[0]["count100"])
             msg += "<:countKatu:789815141168447538> {}  <:count50:789815600553394196> {}  <:countMiss:789815688834842635> {}\n".format(getRecent[0]["countkatu"], getRecent[0]["count50"], getRecent[0]["countmiss"])
             msg += "{}".format(getRecent[0]["date"])
@@ -677,7 +981,7 @@ class Osu(commands.Cog):
         
         msg = "{}\n".format(modsEmoji)
         msg +=  "{} {} ({}/{})\n".format(rankEmoji, score, combo, getBeatmap[0]["max_combo"])
-        msg += "{}% (**PP {}**)\n".format(totalAcc, performance)
+        msg += "ACC: {}%\n".format(totalAcc)
         msg += "<:count300:789814804914372633> {}  <:countGeki:789814942785077258> {}  <:count100:789815074507849738> {}  ".format(getRecent[0]["count300"], getRecent[0]["countgeki"], getRecent[0]["count100"])
         msg += "<:countKatu:789815141168447538> {}  <:count50:789815600553394196> {}  <:countMiss:789815688834842635> {}\n".format(getRecent[0]["countkatu"], getRecent[0]["count50"], getRecent[0]["countmiss"])
         msg += "{}".format(getRecent[0]["date"])
@@ -692,14 +996,21 @@ class Osu(commands.Cog):
         return await ctx.send(content = "**{} Osu!Standard Recent Play**".format(getPlayer[0]["username"]), embed = em)
       except Exception as e:
         print (e)
-        msg = "Player *`{}`* tidak ada recent game yang terekam server Osu!".format(player)
-        em = discord.Embed(color = 0XFF8C00,
-                           description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        return await ctx.send(embed = em)
-
+        if LangCheck == "ID":
+            msg = "Player *`{}`* tidak ada recent game yang terekam server Osu!".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+        if LangCheck == "EN":
+            msg = "There is no recent game for player *`{}`!*".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
 
     async def taiko_standard_recent(self, ctx, player):
+      LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
       try:
         #Get recent
         OsuRecent = requests.get("https://osu.ppy.sh/api/get_user_recent?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}&m=1&limit=1".format(player))
@@ -800,13 +1111,21 @@ class Osu(commands.Cog):
         return await ctx.send(content = "**{} Osu!Taiko Recent Play**".format(getPlayer[0]["username"]), embed = em)
       except Exception as e:
         print (e)
-        msg = "Player *`{}`* tidak ada recent game yang terekam server Osu!".format(player)
-        em = discord.Embed(color = 0XFF8C00,
-                           description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        return await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg = "Player *`{}`* tidak ada recent game yang terekam server Osu!".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+        if LangCheck == "EN":
+            msg = "There is no recent game for player *`{}`!*".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
 
     async def ctb_standard_recent(self, ctx, player):
+      LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
       try:
         #Get recent
         OsuRecent = requests.get("https://osu.ppy.sh/api/get_user_recent?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}&m=2&limit=1".format(player))
@@ -909,14 +1228,22 @@ class Osu(commands.Cog):
         return await ctx.send(content = "**{} Osu!Catch Recent Play**".format(getPlayer[0]["username"]), embed = em)
       except Exception as e:
         print (e)
-        msg = "Player *`{}`* tidak ada recent game yang terekam server Osu!".format(player)
-        em = discord.Embed(color = 0XFF8C00,
-                           description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        return await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg = "Player *`{}`* tidak ada recent game yang terekam server Osu!".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+        if LangCheck == "EN":
+            msg = "There is no recent game for player *`{}`!*".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
 
 
     async def mania_standard_recent(self, ctx, player):
+      LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
       try:
         #Get recent
         OsuRecent = requests.get("https://osu.ppy.sh/api/get_user_recent?k=526d85b33ad4b0912850229a00e17e91b612d653&u={}&m=3&limit=1".format(player))
@@ -1025,11 +1352,67 @@ class Osu(commands.Cog):
             return await ctx.send(content = "**{} Osu!Mania Recent Play**".format(getPlayer[0]["username"]), embed = em)
       except Exception as e:
         print (e)
-        msg = "Player *`{}`* tidak ada recent game yang terekam server Osu!".format(player)
-        em = discord.Embed(color = 0XFF8C00,
-                           description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        return await ctx.send(embed = em)
+        if LangCheck == "ID":
+            msg = "Player *`{}`* tidak ada recent game yang terekam server Osu!".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+        if LangCheck == "EN":
+            msg = "There is no recent game for player *`{}`!*".format(player)
+            em = discord.Embed(color = 0XFF8C00,
+                               description = msg)
+            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            return await ctx.send(embed = em)
+
+    async def language_not_set(self, ctx):
+        msg  = "<:indonesia:798977282886467635> **INDONESIA**\n"
+        msg += "Kamu belum mengatur bahasa untuk bot ini.\n\n"
+        msg += "<:English:798978134711599125> **ENGLISH**\n"
+        msg += "You haven't set the language for this bot.\n\n"
+        msg += "*Pilih dibawah ini / Select it below*"
+
+        em = discord.Embed(color = 0XFF8C00, description = msg)
+        em.set_footer(text = "{}".format(ctx.author),
+                      icon_url = "{}".format(ctx.author.avatar_url))
+        msg = await ctx.send(embed = em, delete_after = 15)
+        await msg.add_reaction('<:indonesia:798977282886467635>')
+        await msg.add_reaction('<:English:798978134711599125>')
+
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for(event='reaction_add',)
+                if user == ctx.author:
+                    emoji = str(reaction.emoji)
+                    if emoji == '<:indonesia:798977282886467635>':
+                        await msg.delete()
+
+                        member = ctx.author
+                        self.settings.setUserStat(member, ctx.guild, "Language", "ID")
+
+                        msg  = "o(>ω<)o Horeeee~!\n"
+                        msg += "Kamu telah mengatur bot ini dengan bahasa indonesia.\n"
+                        msg += "Silahkan ulangi command yang baru saja kamu gunakan."
+                        em = discord.Embed(color = 0XFF8C00, description = msg)
+                        em.set_footer(text = "{}".format(ctx.author),
+                                      icon_url = "{}".format(ctx.author.avatar_url))
+                        await ctx.send(embed = em)
+
+                    if emoji == '<:English:798978134711599125>':
+                        await msg.delete()
+
+                        member = ctx.author
+                        self.settings.setUserStat(member, ctx.guild, "Language", "EN")
+
+                        msg  = "o(>ω<)o Yaaaaay~!\n"
+                        msg += "You have configured this bot in English.\n"
+                        msg += "Please repeat the command that you just used."
+                        em = discord.Embed(color = 0XFF8C00, description = msg)
+                        em.set_footer(text = "{}".format(ctx.author),
+                                      icon_url = "{}".format(ctx.author.avatar_url))
+                        await ctx.send(embed = em)
+            except Exception as e:
+                await msg.send("```\n{}\n```".format(e))
 
 def num_to_mod(number):
     number = int(number)
@@ -1090,3 +1473,5 @@ def num_to_mod_emoticon(number):
     if number & 1<<28:  mod_list.append('<:2K:790992354945269833>')
 
     return mod_list
+
+

@@ -325,6 +325,7 @@ class CogManager(commands.Cog):
             help_embed = discord.Embed(color=random.choice(self.colors))
             
         # Setup blank dict
+        await Msg.delete()
         ext_list = {}
         cog_less = []
         for extension in self.bot.extensions:

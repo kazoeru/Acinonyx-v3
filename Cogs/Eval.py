@@ -45,7 +45,6 @@ class Eval(commands.Cog):
 
     def __init__(self, bot, settings):
         self.bot = bot
-        self.settings = settings
         global Utils, DisplayName
         Utils = self.bot.get_cog("Utils")
         DisplayName = self.bot.get_cog("DisplayName")
@@ -65,6 +64,7 @@ class Eval(commands.Cog):
         FuzzySearch = self.bot.get_cog("FuzzySearch")
         ReadableTime = self.bot.get_cog("ReadableTime")
         Setup = self.bot.get_cog("Setup")
+        self.settings = settings
         osuKey = "526d85b33ad4b0912850229a00e17e91b612d653"
 
 
@@ -107,6 +107,7 @@ class Eval(commands.Cog):
             'commands': commands,
             'ctx': ctx,
             'self': self,
+            'DisplayName' : DisplayName,
             'osuKey': "526d85b33ad4b0912850229a00e17e91b612d653",
             '__import__': __import__
         }

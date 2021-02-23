@@ -203,7 +203,15 @@ class JazUtils(commands.Cog):
         """Menampikan list member dengan spesifik nama role.
         NB: nama role kalo bisa di ketik yaa tapi jangan di mention, biar nggk ganggu member yang lain
 
-        diurutkan berdasarkan Online -> Idle -> DnD -> Offline."""
+        diurutkan berdasarkan Online -> Idle -> DnD -> Offline.
+        
+        Options tersedia(optional):
+        -nick
+        -username
+        
+        Contoh:
+        acx whohas nama_role
+        acx whohas nama_role -nick"""
         mode = 0 # tells how to display: 0 = just mention, 1 = add nickname, 2 = add username
         rolename = rolename.lower()
         if '-nick' in rolename:

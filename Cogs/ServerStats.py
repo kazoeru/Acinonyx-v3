@@ -1,4 +1,4 @@
-import asyncio, discord
+import asyncio, discord, random
 from   discord.ext import commands
 from   Cogs        import Nullify, DisplayName, UserTime, Message, PickList
 
@@ -413,7 +413,8 @@ class ServerStats(commands.Cog):
                                                                "**Panduan**\n"
                                                                "*`{}joinedatpos [position]`*")
             em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        
+            await ctx.send(embed = em)
+            return
         try:
             position = int(position)-1
             assert -1<position<len(ctx.guild.members) 

@@ -152,7 +152,7 @@ class TempRole(commands.Cog):
 			self.settings.role.rem_roles(member, [role])
 			# Check if we pm
 			if self.settings.getServerStat(member.guild, "TempRolePM") and "AddedBy" in found_role:
-				try: await member.send("Role **{}** telah dihapus dari server mu di *{}*.".format(role.name, member.guild.name))
+				try: await member.send("**{}** was removed from your roles in *{}*.".format(role.name, member.guild.name))
 				except: pass
 
 		# Remove it from our TempRoles setting

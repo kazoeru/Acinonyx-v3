@@ -170,10 +170,7 @@ class Dice(commands.Cog):
         • `N` diakhir adalah jumlah sisi dadu.
         • `±Na|d` adalah Number Advantage atau Disadvantage.
         Yang berarti hasil akhir dadu akan dikurangi atau ditambahkan sesuai yang diminta
-        hasilnya bisa angka negatif (-) atau angka positif (+).
-
-        Contoh:
-        `acx!roll 1d10-5d` """
+        hasilnya bisa angka negatif (-) atau angka positif (+)."""
         # Display the table then wait for a reaction
         d = Roller()
         r = d.roll(dice)

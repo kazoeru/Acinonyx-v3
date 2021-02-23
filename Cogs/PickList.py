@@ -122,7 +122,7 @@ class PagePicker(Picker):
             "color":self.ctx.author,
             "pm_after":25,
             "fields":self._get_page_contents(page),
-            "footer":"Page {} of {}".format(page+1,pages)
+            "footer":"Halaman {} dari {}".format(page+1,pages)
         }
         if self.message:
             self.self_message = self.message
@@ -153,7 +153,7 @@ class PagePicker(Picker):
             page = 0 if ind==0 else page-1 if ind==1 else page+1 if ind==2 else pages if ind==3 else page
             if ind == 4:
                 # User selects a page
-                page_instruction = await self.ctx.send("Type the number of that page to go to from {} to {}.".format(1,pages))
+                page_instruction = await self.ctx.send("Silahkan ketik halaman yang akan kamu tuju dari {} sampai {}.".format(1,pages))
                 def check_page(message):
                     try:
                         num = int(message.content)

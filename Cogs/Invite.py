@@ -115,7 +115,7 @@ class Invite(commands.Cog):
                                                                "> Yuuk invite aku ke server mu\n"
                                                                "> klik link dibawah ini yaa kak\n"
                                                                "> **[INVITE ME]({})**"
-                                                               .format(discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(permissions=8))))
+                                                               .format(discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(permissions=314561))))
             em.set_author(name = "Invite Link", url = "https://acinonyxesports.com", icon_url = "https://cdn.discordapp.com/attachments/518118753226063887/725569194304733435/photo.jpg")
             em.set_footer(text = "Request by : {}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
             return await ctx.send(embed=em)

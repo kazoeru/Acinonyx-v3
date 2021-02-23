@@ -8,13 +8,12 @@ import json
 import os
 import copy
 import subprocess
-import random
 
 try:
     import pymongo
 except ImportError:
     # I mean, it doesn't really matter as it can still revert to JSON
-    print("pymongo not installed, preparing to use JSON")
+    print("pymongo belum ready, mempersiapkan menggunakna database JSON")
     pass
 
 from   Cogs        import DisplayName
@@ -225,9 +224,9 @@ class Settings(commands.Cog):
                 "VerificationTime"      : 0,        # Time to wait (in minutes) before assigning default role
                 "LastPicture"           : 0,        # UTC Timestamp of last picture uploaded
                 "PictureThreshold"      : 10,       # Number of seconds to wait before allowing pictures
-                "Rules"                 : "Hormatilah member lain.",
-                "Welcome"               : "Selamat datang *[[user]]* di server *[[server]]!*",
-                "Goodbye"               : "Selamat tinggal *[[user]]*, kami *[[server]]* merindukan mu!",
+                "Rules"                 : "Be nice to each other.",
+                "Welcome"               : "Welcome *[[user]]* to *[[server]]!*",
+                "Goodbye"               : "Goodbye *[[user]]*, *[[server]]* will miss you!",
                 "Info"                  : "",       # This is where you can say a bit about your server
                 "PromotionArray"        : [],       # An array of roles for promotions
                 "OnlyOneRole"           : False,    # Only allow one role from the promo array at a time
@@ -265,7 +264,7 @@ class Settings(commands.Cog):
                 "QuoteAdminOnly"        : True,     # Only admins/bot-admins can quote?
                 "StreamChannel"         : None,     # None or channel id
                 "StreamList"            : [],       # List of user id's to watch for
-                "StreamMessage"         : "Hey semua! *[[user]]* telah memulai streaming *[[game]]!* Cek disini: [[url]]",
+                "StreamMessage"         : "Hey everyone! *[[user]]* started streaming *[[game]]!* Check it out here: [[url]]",
                 "MuteList"              : []}       # List of muted members
                 # Removed for spam
                 # "ChannelMOTD"             : {}}       # List of channel messages of the day
@@ -624,11 +623,9 @@ class Settings(commands.Cog):
             if not "XP" in y:
                 y["XP"] = int(self.getServerStat(server, "DefaultXP"))
                 needsUpdate = True
+            # XP needs to be an int - and uh... got messed up once so we check it here
             if type(y["XP"]) is float:
                 y["XP"] = int(y["XP"])
-            if not "OsuPlayer" in y:
-                y["OsuPlayer"] = None
-                needsUpdate = True
             if not "XPLeftover" in y:
                 y["XPLeftover"] = 0
                 needsUpdate = True
@@ -838,7 +835,8 @@ class Settings(commands.Cog):
 
     @commands.command(pass_context=True)
     async def ownerlock(self, ctx):
-        """Mengunci bot dan hanya owner yang dapat melakukan command (owner-only)."""
+        """Mengunci bot dan hanya owner yang dapat melakukan command (owner-only).
+        Gunakan ini untuk mode Maintenance jika keadaan darurat"""
         author  = ctx.message.author
         server  = ctx.message.guild
         channel = ctx.message.channel
@@ -886,7 +884,7 @@ class Settings(commands.Cog):
 
     # @commands.command(pass_context=True)
     # async def owners(self, ctx):
-    #     """Mel."""
+    #     """Lists the bot's current owners."""
     #     author  = ctx.message.author
     #     server  = ctx.message.guild
     #     channel = ctx.message.channel
@@ -1257,7 +1255,7 @@ class Settings(commands.Cog):
 
     @commands.command(pass_context=True)
     async def prunelocalsettings(self, ctx):
-        """Merubah pengaturan server saat ini menjadi default dan menghapus semua pengaturan yang telah di set dalam server saat ini (owner only)."""
+        """Compares the current server's settings to the default list and removes any non-standard settings (owner only)."""
 
         author  = ctx.message.author
         server  = ctx.message.guild
@@ -1266,19 +1264,15 @@ class Settings(commands.Cog):
         # Only allow owner
         isOwner = self.isOwner(ctx.author)
         if isOwner == None:
-            return
-        elif isOwner == False:
-            msgText = ["Hus hus, jangan main main sama command ini",
-                       "Command ini bahaya loh dek, jangan main main!"]
-            msg = random.choice(msgText)
-            em  = discord.Embed(color = 0XFF8C00, description = msg)
-            em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
+            msg = 'I have not been claimed, *yet*.'
             await ctx.channel.send(msg)
             return
-        msg = "Menghapus semua setting dalam server saat ini..."
-        em  = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        message = await ctx.send(embed = em)
+        elif isOwner == False:
+            msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
+            await ctx.channel.send(msg)
+            return
+
+        message = await ctx.send("Pruning local settings...")
 
         removedSettings = 0
         settingsWord = "settings"
@@ -1295,19 +1289,15 @@ class Settings(commands.Cog):
 
         if removedSettings == 1:
             settingsWord = "setting"
-        msg = "Mengubah dan menyimpan standar setting ke disk local..."
-        em  = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        await message.edit(embed = em)
+        
+        await message.edit(content="Flushing settings to disk...", embed=None)
         
         # Actually flush settings asynchronously here
         l = asyncio.get_event_loop()
         await self.bot.loop.run_in_executor(None, self.flushSettings, self.file, True)
 
-        msg = 'Menghapus *{} {}*.'.format(removedSettings, settingsWord)
-        em  = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        await message.edit(embed = em)
+        msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
+        await message.edit(content=msg, embed=None)
 
     def _prune_servers(self):
         # Remove any orphaned servers
@@ -1382,7 +1372,7 @@ class Settings(commands.Cog):
 
     @commands.command(pass_context=True)
     async def prunesettings(self, ctx):
-        """Merubah pengaturan semua server menjadi default dan menghapus semua pengaturan yang telah di set untuk semua server (owner only)."""
+        """Compares all connected servers' settings to the default list and removes any non-standard settings (owner only)."""
 
         author  = ctx.message.author
         server  = ctx.message.guild
@@ -1391,21 +1381,18 @@ class Settings(commands.Cog):
         # Only allow owner
         isOwner = self.isOwner(ctx.author)
         if isOwner == None:
+            msg = 'I have not been claimed, *yet*.'
+            await ctx.channel.send(msg)
             return
         elif isOwner == False:
-            msgText = ["Hus hus, jangan main main sama command ini",
-                       "Command ini bahaya loh dek, jangan main main!"]
-            msg = random.choice(msgText)
+            msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
             await ctx.channel.send(msg)
             return
 
         removedSettings = 0
         settingsWord = "settings"
 
-        msg = "Mencoba reset semua setting di semua server..."
-        em  = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        message = await ctx.send(embed = em)
+        message = await ctx.send("Pruning settings...")
 
         for serv in self.serverDict["Servers"]:
             # Found it - let's check settings
@@ -1422,23 +1409,19 @@ class Settings(commands.Cog):
 
         if removedSettings == 1:
             settingsWord = "setting"
-        msg = "Mengubah dan menyimpan standar setting ke disk local..."
-        em  = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        await message.edit(embed = em)
+
+        await message.edit(content="Flushing settings to disk...")
         # Actually flush settings asynchronously here
         l = asyncio.get_event_loop()
         await self.bot.loop.run_in_executor(None, self.flushSettings, self.file, True)
         
-        msg = 'Menghapus *{} {}*.'.format(removedSettings, settingsWord)
-        em  = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        await message.edit(embed = em)
+        msg = 'Pruned *{} {}*.'.format(removedSettings, settingsWord)
+        await message.edit(content=msg)
 
 
     @commands.command(pass_context=True)
     async def prune(self, ctx):
-        """Menghapus setting semua member yang telah menghapus akunnya/tidak terkoneksi dengan bot ini (owner only)."""
+        """Iterate through all members on all connected servers and remove orphaned settings (owner only)."""
         
         author  = ctx.message.author
         server  = ctx.message.guild
@@ -1447,20 +1430,15 @@ class Settings(commands.Cog):
         # Only allow owner
         isOwner = self.isOwner(ctx.author)
         if isOwner == None:
+            msg = 'I have not been claimed, *yet*.'
+            await ctx.channel.send(msg)
             return
         elif isOwner == False:
-            msgText = ["Siapa yaa?\nKamu bukan owner ku",
-                       "Kamu bukan owner ku!!",
-                       "Hus hus, jangan main main sama command ini",
-                       "Command ini bahaya loh dek, jangan main main!"]
-            msg = random.choice(msgText)
+            msg = 'You are not the *true* owner of me.  Only the rightful owner can use this command.'
             await ctx.channel.send(msg)
             return
 
-        msg = "Mengecek member dalam list dan mencoba untuk menghapusnya..."
-        em  = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        message = await ctx.send(embed = em)
+        message = await ctx.send("Pruning all orphaned members and settings...")
 
         ser = self._prune_servers()
         sst = self._prune_settings()
@@ -1485,15 +1463,10 @@ class Settings(commands.Cog):
         if glo == 1:
             glo_str = "global user"
 
-        msg = "Menyimpan pengaturan baru ke disk local..."
-        em  = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        await message.edit(embed = em)
+        await message.edit(content="Flushing settings to disk...")
         # Actually flush settings asynchronously here
         l = asyncio.get_event_loop()
         await self.bot.loop.run_in_executor(None, self.flushSettings, self.file, True)
         
-        msg = 'Menghapus *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, glo, glo_str)
-        em  = discord.Embed(color = 0XFF8C00, description = msg)
-        em.set_footer(text = "{}".format(ctx.author), icon_url = "{}".format(ctx.author.avatar_url))
-        await message.edit(embed = em)
+        msg = 'Pruned *{} {}*, *{} {}*, *{} {}*, and *{} {}*.'.format(ser, ser_str, sst, sst_str, mem, mem_str, glo, glo_str)
+        await message.edit(content=msg)

@@ -25,6 +25,9 @@ HelpMsg = """**Welcome & Goodbye Message**
 **OSU!**
 `setosu`, `std`, `taiko`, `ctb`, `mania`, `rstd`, `rtaiko`, `rctb`, `rmania`
 
+**DOTA 2**
+`abilities`, `ability`, `hero`, `item`, `lore`, `leveledstats`, `talents`
+
 **Comic**
 `calvin`, `cyanide`, `dilbert`, `gmg`, `randcalvin`, `randcyanide`, `randgmg`, `randilbert`, `randxkcd`, `xkcd`
 
@@ -34,8 +37,9 @@ HelpMsg = """**Welcome & Goodbye Message**
 **Image Filter**
 `blue`, `blur`, `blurple`, `brightness`, `green`, `greycsale`, `invert`, `pixelate`, `red`, `sepia`, `threshold`
 
-**Chat dengan bot**
+**Chatbot**
 `chat`, `setchatchannel`
+
 
 **Reddit image**
 `reddit`
@@ -112,8 +116,36 @@ class Help(commands.Cog):
 
         if com == None:
             # No command or cog - let's send the coglist
-            embed_list = { "title" : "Help command"}
-            embed_list["description"] = HelpMsg
+            embed_list = { "title" : "Help command", "fields" : []}
+            DescMsg = ">>> <:9032_Senko_happy_nosies:803886640564011019> Halo nama ku Acinonyx\njangan ragu untuk menggunakan ku dalam server mu\nKetik *`{}help [command]`* untuk informasi lebih lanjut".format(ctx.prefix)
+            embed_list["description"] = DescMsg
+            
+            valueMsg = "*```\naddadmin, removeadmin, lock, ban, kick, ignore, listen, removeinvitelinks, log, setrules, joinpm, clean, logenable, logdisable, logging, setlogchannel, adminallow, badminallow, disable, enable, disableall, enableall, listdisabled, disablereact, addemoji, ignoredeath, kill, resurrect, setkillrole, tableflip, addfilter, clearfilter, dumpfilter, listfilter, remfilter, createmuterole, syncmuterole, desyncmuterole\n```*"
+            embed_list["fields"].append({ "name" : "<:3869501:803893026313338912> Moderasi server", "value" : valueMsg, "inline" : False })
+            
+            valueMsg = "*```\nsetosu, std, taiko, ctb, mania, rstd, rtaiko, rctb, rmania\n```*"
+            embed_list["fields"].append({ "name" : "<:4271_osu:803893978390462474> Osu!", "value" : valueMsg})
+            
+            valueMsg = "*```\nabilities, ability, hero, item, lore, leveledstats, talents, lore, courage, herotable, neutralitems, aghanim, blog, fusehero, laning, firstmatch, lastmatch, profile, matchstory, matches, matchids, skillbuild, userconfig, parse, aboutdotabase\n```*"
+            embed_list["fields"].append({ "name" : "<:2994_dota2:803907077541068840> DOTA 2", "value" : valueMsg})
+
+            valueMsg = "*```randcalvin, randcyanide, randgmg, randilbert, randxkcd, calvin, cyanide, gmg, dilbert, xkcd, randcalvin```*"
+            embed_list["fields"].append({ "name" : "<:comic:804319701437906964> Comic", "value" : valueMsg})
+
+            valueMsg = "*```\ncalc, ascii, roll, eightball, color, meme, memetemps, zalgo, morse, unmorse, emoji, weather, tconvert, forecast, wiki,  blue, blur, blurple, brightness, green, greycsale, invert, pixelate, red, sepia, threshold\n```*"
+            embed_list["fields"].append({ "name" : "<:fun:803918712440225793> Fun", "value" : valueMsg})
+
+            valueMsg = "*```\nabandoned, aww, battlestation, beeple, cablefail, carmod, dankmeme, dragon, earthporn, macsetup, meirl, pun, randomcat, randomdog, reddit, ruser, shittybattlestation, software, starterpack, techsupport, wallpaper\n```*"
+            embed_list["fields"].append({ "name" : "<:reddit:803910953938583582> Reddit", "value" : valueMsg})
+            
+            valueMsg = "*```\nrolecount, whohas, emptyroles, roles, avi, messages, allmessages, users, serverinfo, botinfo, cloc, ping, servers, stats, settz, listtz, lastonline, online, invite, joinpos, time, tz, uptime, donate\n```*"
+            embed_list["fields"].append({ "name" : "<:utils:803919381833711616> Utils", "value" : valueMsg})
+
+            valueMsg =  ">>> Acinonyx masih punya lebih dari 200 command loh.\n"
+            valueMsg += "Klik **[DISINI](https://dark-kazoeru.gitbook.io/acinonyx/commands/help-command)** yaa.\n\n"
+            valueMsg += "**Acinonyx Official Website**\n"
+            valueMsg += "[Website](https://acinonyxesports.com) | [Support Server](https://discord.gg/vMcMe8f) | [Acinonyx full docs](https://dark-kazoeru.gitbook.io/acinonyx) | [Donasi](https://saweria.co/NvStar) | [Invite aku](https://discord.com/oauth2/authorize?client_id=725197780162838609&scope=bot&permissions=8)"
+            embed_list["fields"].append({ "name" : "<:website:803921231266578432> Other command & Website", "value" : valueMsg})
             # embed_list = { "title" : "Current Categories", "fields" : [] }
             # command_list = []
             # for cog in sorted(self.bot.cogs):

@@ -194,21 +194,37 @@ class Comic(commands.Cog):
         author  = ctx.message.author
         server  = ctx.message.guild
         
+        if date is None:
+            em = discord.Embed(color = 0XFF8C00, description = "> Mencari komik dari\n"
+                                                               "> http://dilbert.com\n"
+                                                               "> Sesuai tanggal yang di tentukan\n> \n"
+                                                               "> **Panduan Pengunaan**\n"
+                                                               "> `{}dilbert [tanggal MM-DD-YYYY]`\n"
+                                                               "> atau\n"
+                                                               "> `{}randilbert` untuk mencari komik secara random"
+                                                              .format(ctx.prefix,
+                                                                      ctx.prefix))
+            em.set_author(name = "Help command dilbert", url = "https://acinonyxesports.com", icon_url = "https://cdn.discordapp.com/attachments/518118753226063887/725569194304733435/photo.jpg")
+            em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\nRequest by : {}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
+            msg = em
+            await channel.send(embed = msg)
+            return
+        
         if not self.canDisplay(server):
             return
             
         if not date:
             # Auto to today's date
             date = dt.datetime.today().strftime("%m-%d-%Y")
-            
+
         if not self.dateIsValid(date):
             em = discord.Embed(color = 0XFF8C00, description = "> Mencari komik dari\n"
                                                                "> http://dilbert.com\n"
                                                                "> Sesuai tanggal yang di tentukan\n> \n"
                                                                "> **Panduan Pengunaan**\n"
-                                                              "> `{}dilbert [tanggal MM-DD-YYYY]`\n"
+                                                               "> `{}dilbert [tanggal MM-DD-YYYY]`\n"
                                                                "> atau\n"
-                                                              "> `{}randilbert` untuk mencari komik secara random"
+                                                               "> `{}randilbert` untuk mencari komik secara random"
                                                               .format(ctx.prefix,
                                                                       ctx.prefix))
             em.set_author(name = "Help command dilbert", url = "https://acinonyxesports.com", icon_url = "https://cdn.discordapp.com/attachments/518118753226063887/725569194304733435/photo.jpg")
@@ -327,12 +343,28 @@ class Comic(commands.Cog):
         author  = ctx.message.author
         server  = ctx.message.guild
         
+        if date is None:
+            em = discord.Embed(color = 0XFF8C00, description = "> Mencari komik dari\n"
+                                                               "> http://dilbert.com\n"
+                                                               "> Sesuai tanggal yang di tentukan\n> \n"
+                                                               "> **Panduan Pengunaan**\n"
+                                                               "> `{}dilbert [tanggal MM-DD-YYYY]`\n"
+                                                               "> atau\n"
+                                                               "> `{}randilbert` untuk mencari komik secara random"
+                                                              .format(ctx.prefix,
+                                                                      ctx.prefix))
+            em.set_author(name = "Help command dilbert", url = "https://acinonyxesports.com", icon_url = "https://cdn.discordapp.com/attachments/518118753226063887/725569194304733435/photo.jpg")
+            em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\nRequest by : {}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
+            msg = em
+            await channel.send(embed = msg)
+            return
+        
         if not self.canDisplay(server):
             return
             
-        if not date:
-            # Auto to today's date
-            date = dt.datetime.today().strftime("%m-%d-%Y")
+        #if not date:
+        #    # Auto to today's date
+        #    date = dt.datetime.today().strftime("%m-%d-%Y")
             
         if not self.dateIsValid(date):
             # If it's an int - let's see if it fits
@@ -490,6 +522,22 @@ class Comic(commands.Cog):
         author  = ctx.message.author
         server  = ctx.message.guild
         
+        if date == None:
+            em = discord.Embed(color = 0XFF8C00, description = "> Mencari komik dari\n"
+                                                               "> http://dilbert.com\n"
+                                                               "> Sesuai tanggal yang di tentukan\n> \n"
+                                                               "> **Panduan Pengunaan**\n"
+                                                               "> `{}dilbert [tanggal MM-DD-YYYY]`\n"
+                                                               "> atau\n"
+                                                               "> `{}randilbert` untuk mencari komik secara random"
+                                                              .format(ctx.prefix,
+                                                                      ctx.prefix))
+            em.set_author(name = "Help command dilbert", url = "https://acinonyxesports.com", icon_url = "https://cdn.discordapp.com/attachments/518118753226063887/725569194304733435/photo.jpg")
+            em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\nRequest by : {}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
+            msg = em
+            await channel.send(embed = msg)
+            return
+        
         if not self.canDisplay(server):
             return
             
@@ -619,6 +667,22 @@ class Comic(commands.Cog):
         author  = ctx.message.author
         server  = ctx.message.guild
         
+        if date == None:
+            em = discord.Embed(color = 0XFF8C00, description = "> Mencari komik dari\n"
+                                                               "> http://dilbert.com\n"
+                                                               "> Sesuai tanggal yang di tentukan\n> \n"
+                                                               "> **Panduan Pengunaan**\n"
+                                                               "> `{}dilbert [tanggal MM-DD-YYYY]`\n"
+                                                               "> atau\n"
+                                                               "> `{}randilbert` untuk mencari komik secara random"
+                                                              .format(ctx.prefix,
+                                                                      ctx.prefix))
+            em.set_author(name = "Help command dilbert", url = "https://acinonyxesports.com", icon_url = "https://cdn.discordapp.com/attachments/518118753226063887/725569194304733435/photo.jpg")
+            em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\nRequest by : {}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
+            msg = em
+            await channel.send(embed = msg)
+            return
+        
         if not self.canDisplay(server):
             return
             
@@ -740,6 +804,22 @@ class Comic(commands.Cog):
         channel = ctx.message.channel
         author  = ctx.message.author
         server  = ctx.message.guild
+        
+        if date == None:
+            em = discord.Embed(color = 0XFF8C00, description = "> Mencari komik dari\n"
+                                                               "> http://dilbert.com\n"
+                                                               "> Sesuai tanggal yang di tentukan\n> \n"
+                                                               "> **Panduan Pengunaan**\n"
+                                                               "> `{}dilbert [tanggal MM-DD-YYYY]`\n"
+                                                               "> atau\n"
+                                                               "> `{}randilbert` untuk mencari komik secara random"
+                                                              .format(ctx.prefix,
+                                                                      ctx.prefix))
+            em.set_author(name = "Help command dilbert", url = "https://acinonyxesports.com", icon_url = "https://cdn.discordapp.com/attachments/518118753226063887/725569194304733435/photo.jpg")
+            em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\nRequest by : {}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
+            msg = em
+            await channel.send(embed = msg)
+            return
         
         if not self.canDisplay(server):
             return

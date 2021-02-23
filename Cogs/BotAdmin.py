@@ -4,13 +4,13 @@ from   discord.ext import commands
 from   Cogs import Utils, DisplayName, Message
 
 def setup(bot):
-    # Add the bot and deps
+    # hkan bot dan depenciesnya
     settings = bot.get_cog("Settings")
     bot.add_cog(BotAdmin(bot, settings))
 
 class BotAdmin(commands.Cog):
 
-    # Init with the bot reference, and a reference to the settings var
+    # Tambahkan init dengan referensi bot, dan referensi dari settings var.
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
@@ -21,19 +21,32 @@ class BotAdmin(commands.Cog):
         DisplayName = self.bot.get_cog("DisplayName")
 
     async def message(self, message):
-        # Check for discord invite links and remove them if found - per server settings
-        if not self.dregex.search(message.content): return None # No invite in the passed message - nothing to do
-        # Got an invite - let's see if we care
-        if not self.settings.getServerStat(message.guild,"RemoveInviteLinks",False): return None # We don't care
-        # We *do* care, let's see if the author is admin/bot-admin as they'd have power to post invites
+        # Periksa invite link dan hapus jika ditemukan, lakukan pengecekan tiap server settings
+        if not self.dregex.search(message.content): return None # Jika tidak ada invite pada pesan dari member abaikan saja, return None 
+        # Acinonyx mendapatkan invite link dari pesan member, cek apakah Acinonyx harus menghapusnya?
+        if not self.settings.getServerStat(message.guild,"RemoveInviteLinks",False): return None # Nilai False berarti abaikan saja, return None
+        # Acinonyx *memiliki* izin untuk menghapus invite link
+        # cek dulu, apakah pesan itu dari admin server yang memiliki izin untuk melakukan post invite link?
         ctx = await self.bot.get_context(message)
-        if Utils.is_bot_admin(ctx): return None # We are immune!
-        # At this point - we need to delete the message
+        if Utils.is_bot_admin(ctx): return None # Kalau pesan itu dari admin abaikan saja, return None
+        # Disini Acinonyx mendapat invite link tapi bukan dari admin server yang tidak memiliki izin untuk post invite link
+        # hapus saja pesannya
         return { 'Ignore' : True, 'Delete' : True}
 
     @commands.command(pass_context=True)
     async def removeinvitelinks(self, ctx, *, yes_no = None):
-        """on/off auto-delete discord invite links dalam chat (bot-admin only)."""
+        """**INDONESIA**
+        on/off auto-delete discord invite links dalam chat.
+
+        **ENGLISH**
+        Enables/Disables auto-deleting discord invite links in chat.
+        (Admin server only)."""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+
+        if LangCheck == None:
+            # Author belum memilih bahasa
+            await self.language_not_set(ctx)
+
         if not await Utils.is_bot_admin_reply(ctx): return
         await ctx.send(Utils.yes_no_setting(ctx,"Remove discord invite links","RemoveInviteLinks",yes_no))
 
@@ -81,17 +94,34 @@ class BotAdmin(commands.Cog):
 
     @commands.command(pass_context=True)
     async def ignore(self, ctx, *, member = None):
-        """Menambahkan member kedalam ignore list.(bot-admin only)
-        Member yang masuk kedalam ignore list tidak dapat menggunakan bot ini dalam server mu."""
+        """**INDONESIA**
+        Menambahkan member kedalam ignore list.
+        Member yang masuk kedalam ignore list tidak dapat menggunakan bot ini dalam server mu.
+
+        **ENGLISH**
+        Adds a member to the bot's "ignore" list.
+        Member in my ignore list, i will ignore them when they use my commands"""
+        LangCheck = self.settings.getUserStat(ctx.message.author, ctx.message.guild, "Language")
+
+        if LangCheck == None:
+            # Author belum memilih bahasa
+            await self.language_not_set(ctx)
+
         if not await Utils.is_bot_admin_reply(ctx): return
             
         if member == None:
-            em = discord.Embed(color = 0XFF8C00, description = "> Menambahkan member agar tidak dapat menggunakan bot ini dalam server mu\n> \n"
-                                                               "> **Panduan Penggunaan**\n"
-                                                              f"> `{ctx.prefix}ignore [member]`\n")
-            em.set_author(name = "Command ignore", url = "https://acinonyxesports.com", icon_url = "https://cdn.discordapp.com/attachments/518118753226063887/725569194304733435/photo.jpg")
-            em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\nRequest by : {}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
-            msg = em
+            if LangCheck == "ID":
+                em = discord.Embed(color = 0XFF8C00, description = "> Menambahkan member agar tidak dapat menggunakan bot ini dalam server mu\n> \n"
+                                                                   "> **Panduan Penggunaan**\n"
+                                                                  f"> `{ctx.prefix}ignore [member]`\n")
+                em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\nRequest by : {}".format(ctx.author),
+                              icon_url = "{}".format(ctx.author.avatar_url))
+            if LangCheck == "EN":
+                em = discord.Embed(color = 0XFF8C00, description = "> Adds a member to the bot's \"ignore\" list, Member in my ignore list, i will ignore them when they use my commands\n> \n"
+                                                                   "> **Panduan Penggunaan**\n"
+                                                                  f"> `{ctx.prefix}ignore [member]`\n")
+                em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\n{}".format(ctx.author),
+                              icon_url = "{}".format(ctx.author.avatar_url))
             return await ctx.send(embed = msg)
 
         if type(member) is str:
@@ -109,7 +139,18 @@ class BotAdmin(commands.Cog):
         for user in ignoreList:
             if str(member.id) == str(user["ID"]):
                 # Found our user - already ignored
-                return await ctx.send('*{}* telah terdaftar dalam ignore list.'.format(DisplayName.name(member)))
+                em = discord.Embed(color = 0XFF8C00, description = "User <@{}>\n"
+                                                                   "Telah dimasukan kedalam ignore list, dan tidak dapat menggunakan bot ini dalam server mu\n> \n"
+                                                                   "**Daftar list ignore**\n"
+                                                                   "`{}ignored`\n"
+                                                                   "**Panduan penghapusan member**\n"
+                                                                   "`{}listen [member]`"
+                                                                   .format(member.id,
+                                                                           ctx.prefix,
+                                                                           ctx.prefix))
+                em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\n{}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
+                return await ctx.send(embed = em)
+                # return await ctx.send('*{}* telah terdaftar dalam ignore list.'.format(DisplayName.name(member)))
         # Let's ignore someone
         ignoreList.append({ "Name" : member.name, "ID" : member.id })
         self.settings.setServerStat(ctx.guild, "IgnoredUsers", ignoreList)
@@ -122,7 +163,7 @@ class BotAdmin(commands.Cog):
                                                            .format(member.id,
                                                                    ctx.prefix,
                                                                    ctx.prefix))
-        em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\n{}#{}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
+        em.set_footer(text = "Saat mengetik command, tanda [] tidak usah digunakan\n{}".format(ctx.author.name), icon_url = "{}".format(ctx.author.avatar_url))
         await ctx.send(embed = em)
         
     @ignore.error
@@ -326,3 +367,53 @@ class BotAdmin(commands.Cog):
         
         contoh:  acx!ban @user1#1234 @user2#5678 @user3#9012 spam lu anj"""
         await self.kick_ban(ctx,members, "ban")
+
+
+    async def language_not_set(self, ctx):
+        msg  = "<:indonesia:798977282886467635> **INDONESIA**\n"
+        msg += "Kamu belum mengatur bahasa untuk bot ini.\n\n"
+        msg += "<:English:798978134711599125> **ENGLISH**\n"
+        msg += "You haven't set the language for this bot.\n\n"
+        msg += "*Pilih dibawah ini / Select it below*"
+
+        em = discord.Embed(color = 0XFF8C00, description = msg)
+        em.set_footer(text = "{}".format(ctx.author),
+                      icon_url = "{}".format(ctx.author.avatar_url))
+        msg = await ctx.send(embed = em, delete_after = 15)
+        await msg.add_reaction('<:indonesia:798977282886467635>')
+        await msg.add_reaction('<:English:798978134711599125>')
+
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for(event='reaction_add',)
+                if user == ctx.author:
+                    emoji = str(reaction.emoji)
+                    if emoji == '<:indonesia:798977282886467635>':
+                        await msg.delete()
+
+                        member = ctx.author
+                        self.settings.setUserStat(member, ctx.guild, "Language", "ID")
+
+                        msg  = "o(>ω<)o Horeeee~!\n"
+                        msg += "Kamu telah mengatur bot ini dengan bahasa indonesia.\n"
+                        msg += "Silahkan ulangi command yang baru saja kamu gunakan."
+                        em = discord.Embed(color = 0XFF8C00, description = msg)
+                        em.set_footer(text = "{}".format(ctx.author),
+                                      icon_url = "{}".format(ctx.author.avatar_url))
+                        await ctx.send(embed = em)
+
+                    if emoji == '<:English:798978134711599125>':
+                        await msg.delete()
+
+                        member = ctx.author
+                        self.settings.setUserStat(member, ctx.guild, "Language", "EN")
+
+                        msg  = "o(>ω<)o Yaaaaay~!\n"
+                        msg += "You have configured this bot in English.\n"
+                        msg += "Please repeat the command that you just used."
+                        em = discord.Embed(color = 0XFF8C00, description = msg)
+                        em.set_footer(text = "{}".format(ctx.author),
+                                      icon_url = "{}".format(ctx.author.avatar_url))
+                        await ctx.send(embed = em)
+            except Exception as e:
+                await msg.send("```\n{}\n```".format(e))

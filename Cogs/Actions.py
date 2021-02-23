@@ -7,36 +7,36 @@ from   Cogs import DisplayName
 from   Cogs import Nullify
 
 def setup(bot):
-	# Menambahkan bot
+	# Add the bot
 	bot.add_cog(Actions(bot))
 
 class Actions(commands.Cog):
-	## class untuk handle storing dan action message
+	## class that handles storing and computing action messages
 	class actionable:
-		## harus diisi di kelas override. setiap {} diganti dengan target member name
-		nothingList = [] # saat kamu memanggil tanpa argument
-		botList = [] # saat action dilakukan dengan bot
-		selfList = [] # saat action dilakukan pada user yang memanggilnya
-		memberList = [] # saat action dilakukan kepada user lain
-		itemList = [] # saat action dilakukan pada string text yang bukan anggota
+		## these should be filled in the override class. any {} are replaced with target member's name
+		nothingList = [] # when you call without any arguments
+		botList = [] # when the action is done at the bot
+		selfList = [] # when the action is done at the user who called it
+		memberList = [] # when the action is done toward another member
+		itemList = [] # when the action is done on a string of text that is not a member
 
 		def computeAction(self, bot, ctx, target):
-			'''return pesan berdasarkan context dan argument command'''
+			'''return a message based on the context and argument of the command'''
 			mesg = ""
 
-			if not target: # tidak ada arguments
+			if not target: # no arguments
 				mesg = random.choice(self.nothingList)
 			else:
 				targetMember = DisplayName.memberForName(target, ctx.message.guild)
 
 				if targetMember:
-					if self.botList and targetMember.id == bot.user.id: # action dengan bot
-						mesg = random.choice(self.botList) # jika botList kosong, akan dialihkan ke member list
-					elif self.selfList and targetMember.id == ctx.message.author.id: # action dengan diri sendiri
+					if self.botList and targetMember.id == bot.user.id: # actioning the bot
+						mesg = random.choice(self.botList) # if botList is empty we fail over to the member list
+					elif self.selfList and targetMember.id == ctx.message.author.id: # actioning themselves
 						mesg = random.choice(self.selfList)
-					else: # action dengan user lain
+					else: # actioning another user
 						mesg = random.choice(self.memberList).replace("{}",DisplayName.name(targetMember))
-				else: # action dengan Item
+				else: # actioning an item
 					mesg = random.choice(self.itemList)
 					if '{}' in mesg:
 						mesg = mesg.format(target)
@@ -45,153 +45,172 @@ class Actions(commands.Cog):
 			mesgFull = Nullify.clean(mesgFull)
 			return mesgFull
 
-	## Kumpulan pesan dari semua action
+	## static definitions of all the action messages
 	class eating(actionable):
-		nothingList = [ 'kamu hanya duduk diam, bengong sambil mikirin mantan, dan gak lagi makan apa apa :(...',
-						'*yakin* kamu punya sesuatu untuk dimakan? kamu tu cuma bisa gigit jari doang...']
-		botList = [ 'kamu mau makan *aku*? tapi sayang loh, ku cuma bot, aku cuma ada baut untuk kamu makan.',
-					'saat mulut mu terbuka lebar dalam beberapa detik kamu sadar *aku* telah memakan *mu*.',
-					'aku hanya bot. kamu tidak dapat memakan ku.',
-					'saat kamu menutup mulut mu... tunggu... tidak ada apa-apa, karena aku hanyalah bot digital!*.',
-					'akan jadi bot seperti apa aku ini?, kalau aku membiarkan mu memakan ku']
-		selfList = ['kamu menggigit tangan mu sendiri - tidak heran, jika itu menyakitkan.',
-					'kamu memasukan satu jari kedalam mulut mu, tetapi kamu *tidak bisa* untuk menggigitnya.',
-					'tunggu - kamu bukan makanan!',
-					'mungkin kamu bukan yang paling pintar...']
-		memberList = [  'kamu membuka mulut dengan lebar dan memakan *{}* dalam satu gigitan.',
-						'kamu mencoba memakan *{}*, tapi kamu tidak dapat melakukannya - lalu kamu memuntahkannya, *{}* memiliki rasa yang seperti bau ketiak...',
-						'kamu menggigit *{}* dengan sangat cepat. bahkan dia tidak dapat menyadarinya.',
-						'kamu menggigit *{}* tepat dibahunya - lalu dia menghadapkan mukanya ke arah mu dan memiliki bola mata yang putih semua, kamu berusaha lari secepatnya sambil ngompol.']
-		itemList = [ 	'kamu mengambil gigitan besar *{}*, dan rasanya anjim banget',
-						'kamu mengambil gigitan pertama *{}* - dan rasanya menakjubkan!!',
-						'kamu sangat rakus dan merobek *{}* hingga kecil-kecil!',
-						'kamu sudah sangat kenyang dan tidak dapat memaksa dirimu untuk memakan *{}*, jadi kamu hanya meninggalkannya...']
+		nothingList = [ 'you sit quietly and eat *nothing*...',
+						'you\'re *sure* there was something to eat, so you just chew on nothingness...',
+						'there comes a time when you need to realize that you\'re just chewing nothing for the sake of chewing.  That time is now.']
+		botList = [ 'you try to eat *me* - but unfortunately, I saw it coming - your jaw hangs open as I deftly sidestep.',
+					'your mouth hangs open for a brief second before you realize that *I\'m* eating *you*.',
+					'I\'m a bot.  You can\'t eat me.',
+					'your jaw clamps down on... wait... on nothing, because I\'m *digital!*.',
+					'what kind of bot would I be if I let you eat me?']
+		selfList = ['you clamp down on your own forearm - not surprisingly, it hurts.',
+					'you place a finger into your mouth, but *just can\'t* force yourself to bite down.',
+					'you happily munch away, but can now only wave with your left hand.',
+					'wait - you\'re not a sandwich!',
+					'you might not be the smartest...']
+		memberList = [  'you unhinge your jaw and consume *{}* in one bite.',
+						'you try to eat *{}*, but you just can\'t quite do it - you spit them out, the taste of failure hanging in your mouth...',
+						'you take a quick bite out of *{}*.  They probably didn\'t even notice.',
+						'you sink your teeth into *{}\'s* shoulder - they turn to face you, eyes wide as you try your best to scurry away and hide.',
+						'your jaw clamps down on *{}* - a satisfying *crunch* emanates as you finish your newest meal.']
+		itemList = [ 	'you take a big chunk out of *{}*. *Delicious.*',
+						'your teeth sink into *{}* - it tastes satisfying.',
+						'you rip hungrily into *{}*, tearing it to bits!',
+						'you just can\'t bring yourself to eat *{}* - so you just hold it for awhile...',
+						'you attempt to bite into *{}*, but you\'re clumsier than you remember - and fail...']
 
 	class drinking(actionable):
-		nothingList = [ 'kamu metanap gelas yang penuh dengan *angin*...',
-						'cangkir itu pasti berisi sesuatu, lalu kamu mengambilnya dan akhirnya kamu hanya meminum *angin*...',
-						'mungkin kamu butuh minum, sana ambil air dan cepat minum.',
-						'terlihat sebuah meja oleh mu, ketika kamu mendekat - dan tidak ada apa-apa',
-						'kamu tau kan bagaimana caranya minum?',
-						'kamu mencari mati-matian sesuatu untuk di minum']
-		botList = [ 'kamu yakin mau meminum *ku*',
-					'kamu mencari *ku* untuk meminum *ku*? saat kamu sadar *aku* telah meminum *mu*!',
-					'aku cuma bot, kamu tidak bisa meminum ku.',
+		nothingList = [ 'you stare at your glass full of *nothing*...',
+						'that cup must\'ve had something in it, so you drink *nothing*...',
+						'you should probably just go get a drink.',
+						'that desk looks pretty empty',
+						'are you sure you know what drinking is?',
+						'you desperatly search for something to drink']
+		botList = [ 'you try to drink *me*, but I dodge your straw.',
+					'You search for me, only to realise that *I* am already drinking you!',
+					'I\'m a bot.  You can\'t drink me.',
 					'you stick a straw in... wait... in nothing, because I\'m *digital!*.',
-					'apa yang kamu pikirkan jika aku membiarkan mu meminum ku?',
-					'aku pikir sepertinya kamu tidak akan suka rasanya jika kamu mencicipi ku',
-					'kamu tidak dapat meminum ku, aku hanyalah sebuah program!']
-		selfList = ['kamu menusuk dirimu sendiri dengan sedotan - tidak heran, jika itu menyakitkan.',
-					'kamu mencoba masuk kedalam sebuah cangkir, tapi kamu tidak dapat melakukannya.',
-					'tunggu dulu - kamu bukan minuman!',
-					'mungkin kamu bukan yang paling pintar...',
-					'kamu mungkin memiliki beberapa masalah...',
-					'kamu mencoba meminum dirimu sendiri.',
-					'kepana kamu mau meminum dirimu sendiri?']
-		memberList = [  'kamu mengambil sedotan keberuntungan mu dan meminum *{}* dalam satu kali sedot.',
-						'kamu mencoba meminum *{}*, tetapi kamu tidak dapat melakukannya - lalu kamu meludahkannya, rasanya seperti air got...',
-						'kamu meminum sedikit minuman milik *{}* dengan cepat. bahkan dia tidak menyadarinya.',
-						'kamu menusuk *{}* dengan sedotan tepat di bahunya - lalu kamu melarikan diri saat dia mengejar mu.',
-						'kamu terlihat sangat haus - *{}* mengorbankan dirinya untuk mu.']
-		itemList = ['kamu mengambil isapan besar *{}*. *Muantaaaaap!*',
-					'sedotan mu tenggelam di *{}* - rasanya uenak sekali.',
-					'kamu tidak bisa memaksakan dirimu untuk meminum *{}* - jadi kamu menahannya...',
-					'kamu meminum *{}*.']
+					'what do you think I am to let you drink me?',
+					'I don\'t think you would like the taste of me.',
+					'you can\'t drink me, I\'m a machine!']
+		selfList = ['you stab yourself with a straw - not surprisingly, it hurts.',
+					'you fit yourself in to a cup, but you just can\'t do it.',
+					'you happily drink away, but you are now very floppy.',
+					'wait - you\'re not a drink!',
+					'you might not be the smartest...',
+					'you might have some issues.',
+					'you try to drink yourself.',
+					'why would you drink yourself?']
+		memberList = [  'you grab your lucky straw and empty *{}* in one sip.',
+						'you try to drink *{}*, but you just can\'t quite do it - you spit them out, the taste of failure hanging in your mouth...',
+						'you drink a small sip of *{}*.  They probably didn\'t even notice.',
+						'you stab your straw into *{}\'s* shoulder - You run away as they run after you.',
+						'you happily drink away - *{}* starts to look like an empty Capri Sun package.',
+						'you are thirsty - *{}* sacrifices themself involuntarily.',
+						'somehow you end up emptying *{}*.']
+		itemList = ['you take a big sip of *{}*. *Delicious.*',
+					'your straw sinks into *{}* - it tastes satisfying.',
+					'you thirstly guzzle *{}*, it\'s lovely!',
+					'you just can\'t bring yourself to drink *{}* - so you just hold it for awhile...',
+					'you attempt to drain *{}*, but you\'re clumsier than you remember - and fail...',
+					'you drink *{}*.',
+					'*{}* dries up from your drinking.',
+					'*{}* starts resembling the Aral Sea.']
 
-	# class booping(actionable):
-	# 	nothingList = [ 'you stretch out your hand in the air, but there\'s nothing there...',
-	# 					'you try and find someone to boop, but there\'s no one there.',
-	# 					'you look around the channel for someone to boop.',
-	# 					'you eye all the heads in the room, just waiting to be booped.',
-	# 					'are you sure you have someone to boop?',
-	# 					'I get it. You want to boop *someone*.']
-	# 	selfList = ['you boop yourself on the nose with your finger.',
-	# 				'you try to boop your head, but your hand gets lost along the way.',
-	# 				'you happily boop yourself, but you are now very giddy.',
-	# 				'wait - are you sure you want to boop yourself?',
-	# 				'you might not be the smartest...',
-	# 				'you might have some issues.',
-	# 				'you try to boop yourself.',
-	# 				'why would you boop yourself?']
-	# 	memberList = [  'you outstretch your lucky finger and boop *{}* in one go.',
-	# 					'you try to boop *{}*, but you just can\'t quite do it - you miss their head, the taste of failure hanging stuck to your hand...',
-	# 					'you sneak a boop onto *{}*.  They probably didn\'t even notice.',
-	# 					'you poke your hand onto *{}\'s* hand - You run away as they run after you.',
-	# 					'you happily drum your fingers away - *{}* starts to look annoyed.',
-	# 					'you\'re feeling boopy - *{}* sacrifices themself involuntarily.',
-	# 					'somehow you end up booping *{}*.',
-	# 					'you climb *{}*\'s head and  use it as a bouncy castle... they feel amused.']
-	# 	itemList = ['you put your hand onto *{}*\'s head. *Bliss.*',
-	# 				'your hand touches *{}*\'s snoot - it feels satisfying.',
-	# 				'you happily boop *{}*, it\'s lovely!',
-	# 				'you just can\'t bring yourself to boop *{}* - so you just let your hand linger...',
-	# 				'you attempt to boop *{}*, but you\'re clumsier than you remember - and fail...',
-	# 				'you boop *{}*.',
-	# 				'*{}* feels annoyed from your booping.',
-	# 				'*{}* starts resembling a happy pupper.']
+	class booping(actionable):
+		nothingList = [ 'you stretch out your hand in the air, but there\'s nothing there...',
+						'you try and find someone to boop, but there\'s no one there.',
+						'you look around the channel for someone to boop.',
+						'you eye all the heads in the room, just waiting to be booped.',
+						'are you sure you have someone to boop?',
+						'I get it. You want to boop *someone*.']
+		selfList = ['you boop yourself on the nose with your finger.',
+					'you try to boop your head, but your hand gets lost along the way.',
+					'you happily boop yourself, but you are now very giddy.',
+					'wait - are you sure you want to boop yourself?',
+					'you might not be the smartest...',
+					'you might have some issues.',
+					'you try to boop yourself.',
+					'why would you boop yourself?']
+		memberList = [  'you outstretch your lucky finger and boop *{}* in one go.',
+						'you try to boop *{}*, but you just can\'t quite do it - you miss their head, the taste of failure hanging stuck to your hand...',
+						'you sneak a boop onto *{}*.  They probably didn\'t even notice.',
+						'you poke your hand onto *{}\'s* hand - You run away as they run after you.',
+						'you happily drum your fingers away - *{}* starts to look annoyed.',
+						'you\'re feeling boopy - *{}* sacrifices themself involuntarily.',
+						'somehow you end up booping *{}*.',
+						'you climb *{}*\'s head and  use it as a bouncy castle... they feel amused.']
+		itemList = ['you put your hand onto *{}*\'s head. *Bliss.*',
+					'your hand touches *{}*\'s snoot - it feels satisfying.',
+					'you happily boop *{}*, it\'s lovely!',
+					'you just can\'t bring yourself to boop *{}* - so you just let your hand linger...',
+					'you attempt to boop *{}*, but you\'re clumsier than you remember - and fail...',
+					'you boop *{}*.',
+					'*{}* feels annoyed from your booping.',
+					'*{}* starts resembling a happy pupper.']
 
 	class spooky(actionable):
-		nothingList = [ 'kamu mencoba menakut-nakuti tapi tidak ada siapa siapa',
-						'kamu menakut-nakuti angin...',
-						'sayangnya, tidak ada yang takut padamu']
+		nothingList = [ 'you spook no one but yourself',
+						'you spook nothing, sp00py...',
+						'sadly, no one got spooked',
+						'it is sp00... you can\t spook air']
 		botList = [ 'you scared the living pumpkin out of me!',
-					'kamu mencoba menakut-nakuti ku dengan begitu keras, wooo garing...', # https://www.myenglishteacher.eu/blog/idioms-for-being-afraid/
-					'kamu mencoba menakut-nakuti ku? tapi aku hanyalah sebuah bot... aku tidak bisa kamu takuti :P',
-					'maaf, tapi aku tidak akan membiarkan mu menakut nakuti ku!'
-					'aaaaaaaaaah! jangan menakut-nakuti ku seperti itu!']
-		selfList = ['cobalah untuk menonton film horror!',
-					'booo! kamu takut dengan dirimu sendiri?',
-					'kamu berjalan menuju cermin dan kamu ketakutan saat melihat wajah mu sendiri...',
-					'kamu ketakutan... oleh dirimu sendiri?']
-		memberList = [  'kamu menakut nakuiti *{}* dan dia mulai menjerit!',
-						'kamu mencoba menyelinap ke *{}*, tapi dia sadar dan gagal...',
-						'selamat! kamu menakuti *{}* dan dia ketakutan.']
-		itemList = ['kamu mencoba menakuti *{}* dan tidak ada reaksi apa-apa, lalu pergi meninggalkan mu dan berpikir kamu itu aneh...',
-					'kamu mencoba menakut-nakuti *{}* dan tidak ada reaksi apa-apa...',
-					'kamu melakukan yang terbaik untuk menakuti *{}*, tapi gagal...',
-					'sp00py time! *{}* terlihat sangat ketakutan dari yang kamu bayangkan, dan dia mulai menangis!']
+					'you spooked me so hard, I got the Heebie-jeebies...', # https://www.myenglishteacher.eu/blog/idioms-for-being-afraid/
+					'you sp00p me? But I\'m a bot... I can\'t be spooked!',
+					'sorry, but I cannot let you spook me; My digital emotions will get all messed up!'
+					'aaaaaaaaaah! Don\t you scare me like that again!']
+		selfList = ['go watch a scary movie to be absolutely sp00ped!',
+					'boo! Did you scare you?',
+					'you look yourself in the mirror and get a little scared...',
+					'get spooked by... yourself?',
+					'sp00py, but why spook yourself?']
+		memberList = [  'you sp00p *{}* so hard that they start screaming!',
+						'you tried to sneak up on *{}*, but they heard you sneakin\' and fail...',
+						'it is sp00py time! Hey *{}*, boo!',
+						'congrats, *{}* dun sp00ked.',
+						'get spook3d *{}*!']
+		itemList = ['you spook *{}* with no reaction, leaving you looking weird...',
+					'*{}* got sp00p3d so hard, it ran away!',
+					'you trick or treat *{}* without any reaction...',
+					'you do your best to sp00p *{}*, but fail...',
+					'sp00py time! *{}* gets sp00ped harder than you thought and starts crying!']
 
-	# class highfives(actionable):
-	# 	nothingList = [ 'kamu berdiri sendiri untuk selamanya, sambil mengangkat tangan - dan tidak ada yang peduli...',
-	# 					'kamu mengayunkan tangan mu sekuat tenaga - dan kamu - high fiveless...',
-	# 					'the only sound you hear as a soft *whoosh* as your hand connects with nothing...']
-	# 	botList = [ 'the sky erupts with 1\'s and 0\'s as our hands meet in an epic high five of glory!',
-	# 				'you beam up to the cloud and receive a quick high five from me before downloading back to Earth.',
-	# 				'I unleash a fork-bomb of high five processes!',
-	# 				'01001000011010010110011101101000001000000100011001101001011101100110010100100001']
-	# 	selfList = ['ahh - high fiving yourself, classy...',
-	# 				'that\'s uh... that\'s just clapping...',
-	# 				'you run in a large circle - *totally* high fiving all your friends...',
-	# 				'now you\'re at both ends of a high five!']
-	# 	memberList = [  'you and *{}* jump up for an epic high five - freeze-framing as the credits roll and some wicked 80s synth plays out.',
-	# 					'you and *{}* elevate to a higher plane of existence in wake of that tremendous high five!',
-	# 					'a 2 hour, 3 episode anime-esque fight scene unfolds as you and *{}* engage in a world-ending high five!',
-	# 					'it *was* tomorrow - before you and *{}* high fived with enough force to spin the Earth in reverse!',
-	# 					'like two righteous torpedoes - you and *{}* connect palms, subsequently deafening everyone in a 300-mile radius!']
-	# 	itemList = ['neat... you just high fived *{}*.',
-	# 				'your hand flops through the air - hitting *{}* with a soft thud.',
-	# 				'you reach out a hand, gently pressing your palm to *{}*.  A soft *"high five"* escapes your lips as a tear runs down your cheek...',
-	# 				'like an open-handed piston of ferocity - you drive your palm into *{}*.']
+	class highfives(actionable):
+		nothingList = [ 'you stand alone for an eternity, hand raised up - desperate for any sort of recognition...',
+						'with a wild swing you throw your hand forward - the momentum carries you to the ground and you just lay there - high fiveless...',
+						'the only sound you hear as a soft *whoosh* as your hand connects with nothing...']
+		botList = [ 'the sky erupts with 1\'s and 0\'s as our hands meet in an epic high five of glory!',
+					'you beam up to the cloud and receive a quick high five from me before downloading back to Earth.',
+					'I unleash a fork-bomb of high five processes!',
+					'01001000011010010110011101101000001000000100011001101001011101100110010100100001']
+		selfList = ['ahh - high fiving yourself, classy...',
+					'that\'s uh... that\'s just clapping...',
+					'you run in a large circle - *totally* high fiving all your friends...',
+					'now you\'re at both ends of a high five!']
+		memberList = [  'you and *{}* jump up for an epic high five - freeze-framing as the credits roll and some wicked 80s synth plays out.',
+						'you and *{}* elevate to a higher plane of existence in wake of that tremendous high five!',
+						'a 2 hour, 3 episode anime-esque fight scene unfolds as you and *{}* engage in a world-ending high five!',
+						'it *was* tomorrow - before you and *{}* high fived with enough force to spin the Earth in reverse!',
+						'like two righteous torpedoes - you and *{}* connect palms, subsequently deafening everyone in a 300-mile radius!']
+		itemList = ['neat... you just high fived *{}*.',
+					'your hand flops through the air - hitting *{}* with a soft thud.',
+					'you reach out a hand, gently pressing your palm to *{}*.  A soft *"high five"* escapes your lips as a tear runs down your cheek...',
+					'like an open-handed piston of ferocity - you drive your palm into *{}*.']
 
 	class petting(actionable): # meow
-		nothingList = [ 'kamu tanpa sadar hanya membelai angin.',
-						'kamu bersumpah, kamu telah melihat se-ekor kucing disana!',
-						'kamu mengingatnya bahwa tidak ada kucing disini.',
-						'kamu mencoba untuk membelai kucing, tetapi kucing itu telah pergi.']
-		botList = [ 'aku mungkin hanya sebuah digital, tapi saya masih mau di belai-belai.',
+		nothingList = [ 'you absentmindedly wave your hand in the air.',
+						'you could have sworn there was a cat there!',
+						'you remember that there are no cats here.',
+						'you try to pet the cat, but miss because the cat is gone.']
+		botList = [ 'I may be electronic but I still appreciate pets.',
 					'*purrrrrrrrrrrrrrr*.',
-					'kamu tersengat listrik saat membelai sebuah komputer.']
-		selfList = ['kamu memberi belaian dikapala mu sendiri.',
-					'sayang sekali tidak ada yang mau membelaimu.',
-					'rambut mu begitu hangat dan lembut.']
-		memberList = [  'kamu memberi sebuah belaian ke *{}* dikepalanya.',
-						'kamu membelai rambut milik *{}*.',
-						'*{}* tersenyum oleh belaian mu.',
-						'kamu mencoba membelai *{}*, tetapi kamu gagal karena dia bersembunyi di bawah kasur.',
-						'kamu membelai *{}* tapi dia menggigit tangan mu',
-						'kamu mencoba membelai *{}* dan gagal lalu dia lari.']
-		itemList = ['kamu membelai *{}* tapi itu tidak terasa seperti kucing.',
-					'kamu menyakiti tangan mu sendiri, saat ingin membelai *{}*.']
+					'you electrocute yourself trying to pet a computer.']
+		selfList = ['you give yourself a nice pat on the head.',
+					'too bad there\'s no one else to pet you.',
+					'in lieu of anything else to pet, you pet yourself.',
+					'your hair is warm and soft.']
+		memberList = [  'you give *{}* a pat on the head.',
+						'you rub your hand through *{}\'s* hair.',
+						'*{}* smiles from your petting.',
+						'you try to pet *{}*, but miss because they hid under the bed.',
+						'*{}* purrs from your petting.',
+						'you pet *{}* but they bite your hand',
+						'you try to pet *{}* but they hiss and run away.']
+		itemList = ['you rub *{}* but it doesn\'t feel like a cat.',
+					'you don\'t hear any purring from *{}*.',
+					'you hurt your hand trying to pet *{}*.']
 
 	# Init with the bot reference, and a reference to the settings var
 	def __init__(self, bot):
@@ -202,7 +221,7 @@ class Actions(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def eat(self, ctx, *, member : str = None):
-		"""Makan boss."""
+		"""Eat like a boss."""
 
 		msg = self.eating.computeAction(self.eating, self.bot, ctx, member) #python is silly and makes me do this for uninitialized classes
 		await ctx.channel.send(msg)
@@ -210,23 +229,23 @@ class Actions(commands.Cog):
 
 	@commands.command(pass_context=True)
 	async def drink(self, ctx, *, member : str = None):
-		"""Minum dulu boss."""
+		"""Drink like a boss."""
 
 		msg = self.drinking.computeAction(self.drinking, self.bot, ctx, member)
 		await ctx.channel.send(msg)
 		return
 
-	# @commands.command(pass_context=True)
-	# async def boop(self, ctx, *, member : str = None):
-	# 	"""Boop da snoot."""
+	@commands.command(pass_context=True)
+	async def boop(self, ctx, *, member : str = None):
+		"""Boop da snoot."""
 
-	# 	msg = self.booping.computeAction(self.booping, self.bot, ctx, member)
-	# 	await ctx.channel.send(msg)
-	# 	return
+		msg = self.booping.computeAction(self.booping, self.bot, ctx, member)
+		await ctx.channel.send(msg)
+		return
 
 	@commands.command(pass_context=True)
 	async def spook(self, ctx, *, member : str = None):
-		"""booo~"""
+		"""sp00ktober by camiel."""
 
 		if datetime.date.today().month == 10:
 			# make it extra sp00py because it is spooktober
@@ -235,13 +254,13 @@ class Actions(commands.Cog):
 		await ctx.channel.send(msg)
 		return
 
-	# @commands.command(pass_context=True)
-	# async def highfive(self, ctx, *, member : str = None):
-	# 	"""High five like a boss."""
+	@commands.command(pass_context=True)
+	async def highfive(self, ctx, *, member : str = None):
+		"""High five like a boss."""
 
-	# 	msg = self.highfives.computeAction(self.highfives, self.bot, ctx, member)
-	# 	await ctx.channel.send(msg)
-	# 	return
+		msg = self.highfives.computeAction(self.highfives, self.bot, ctx, member)
+		await ctx.channel.send(msg)
+		return
 
 	@commands.command(pass_context=True)
 	async def pet(self, ctx, *, member : str = None):
