@@ -1,0 +1,78 @@
+[project]
+name = "Acinonyx-v3-2"
+version = "3.282.0"
+description = "Acinonyx bot discord."
+authors = [
+    "[ACX] NvStar <acinonyx.esports@gmail.com>"
+]
+license = "MIT"
+readme = "README.md"
+python = "^3.6"
+homepage = "https://acinonyxesports.com"
+repository = "https://acinonyxesports.com"
+documentation = "https://dark-kazoeru.gitbook.io/acinonyx"
+
+keywords = ["packaging", "dependency", "infer", "pyproject.toml"]
+
+classifiers = [
+    "Topic :: discord bot"
+]
+
+# Requirements
+[dependencies]
+Click = "^7.0"
+
+[dev-dependencies]
+black = { version = "^18.3-alpha.0", python = "^3.8" }
+
+[scripts]
+poetry = "infer_pyproject.cli:main"
+
+[build-system]
+requires = [
+    "setuptools >= 35.0.2",
+    "setuptools_scm >= 2.0.0, <3",
+    "discord [rewrite]",
+    "discord.py[voice]",
+    "pillow",
+    "Wavelink",
+    "Requests",
+    "parsedatetime",
+    "pyparsing",
+    "pyquery",
+    "pyaiml >= git+https://github.com/paulovn/python-aiml",
+    "speedtest-cli",
+    "pytz",
+    "wikipedia",
+    "googletrans",
+    "giphypop >= git+https://github.com/shaunduncan/giphypop.git#egg=giphypop",
+    "numpy",
+    "pymongo",
+    "igdb_api_python",
+    "geopy"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 88
+target_version = ['py38']
+include = '\.pyi?$'
+exclude = '''
+
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | foo.py           # also separately exclude a file named foo.py in
+                     # the root of the project
+)
+'''

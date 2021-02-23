@@ -152,25 +152,25 @@ class Run:
 if __name__ == '__main__':
     r = Run()
     modules = [
-        {"name":"discord [rewrite]", "item":"discord.py[voice]"},
-        {"name":"pillow"},
+        {"name":"discord.py[voice]"},
+        {"name":"aiohttp"},
         # {"name":"youtube-dl"},
-        {"name":"Wavelink"},
-        {"name":"Requests"},
-        {"name":"parsedatetime"},
-        {"name":"psutil"},
-        {"name":"pyparsing"},
-        {"name":"pyquery"},
-        {"name":"pyaiml", "item":"git+https://github.com/paulovn/python-aiml"},
-        {"name":"speedtest-cli"},
-        {"name":"pytz"},
-        {"name":"wikipedia"},
-        {"name":"mtranslate"},
-        {"name":"giphypop", "item":"git+https://github.com/shaunduncan/giphypop.git#egg=giphypop"},
+        {"name":"async_timeout"},
+        {"name":"beautifulsoup4"},
+        {"name":"colorgram.py"},
+        {"name":"gTTS"},
+        {"name":"gTTS-token"},
+        {"name":"SQLAlchemy"},
+        {"name":"Pillow"},
+        {"name":"youtube-dl"},
+        {"name":"dotabase"},
+        {"name":"praw"},
         {"name":"numpy"},
-        {"name":"pymongo"},
-        {"name":"igdb_api_python"},
-        {"name":"geopy"}
+        {"name":"databases"},
+        {"name":"aiosqlite"},
+        {"name":"feedparser"},
+        {"name":"python-dateutil"}
+        #{"name":"geopy"}
     ]
     item = 0
     for module in modules:
